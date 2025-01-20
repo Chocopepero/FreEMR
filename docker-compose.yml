@@ -1,22 +1,31 @@
+version: "3.8"
+
 services:
   frontend:
     build:
-      context: ./Frontend
+      context: ./frontend
       dockerfile: Dockerfile
+    container_name: nextjs_frontend
     ports:
       - "3000:3000"
     volumes:
-      - ./Frontend:/usr/src/app
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
     depends_on:
       - backend
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev"]
 
   backend:
     build:
-      context: ./Backend
+      context: ./backend
       dockerfile: Dockerfile
+    container_name: django_backend
     ports:
       - "8000:8000"
     volumes:
-      - ./Backend:/usr/src/app
+      - ./backend:/usr/src/app
     environment:
       - PYTHONUNBUFFERED=1
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
