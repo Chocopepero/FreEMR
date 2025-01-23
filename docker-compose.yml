@@ -9,7 +9,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/usr/src/app
+      - ./frontend:/usr/src/app:rw
       - /usr/src/app/node_modules
     depends_on:
       - backend
@@ -25,7 +25,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/usr/src/app
+      - ./backend:/usr/src/app:rw
     environment:
       - PYTHONUNBUFFERED=1
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
