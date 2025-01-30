@@ -11,8 +11,10 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - backend
-    environment:
-      - NODE_ENV=development
+    networks:
+      - freemr-network
+    env_file:
+      - .env
     command: ["npm", "run", "dev"]
 
   backend:
@@ -24,6 +26,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/usr/src/app:rw
-    environment:
-      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    networks:
+      - freemr-network
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+networks:
+  freemr-network:
+    driver: bridge

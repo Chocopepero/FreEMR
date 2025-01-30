@@ -1,5 +1,5 @@
 async function fetchData() {
-    const res = await fetch("http://backend:8000/api/application-data", {
+    const res = await fetch(`${process.env.APP_BACKEND_URL}/api/application-data`, {
       cache: "no-store", // Ensure fresh data on each load
     });
     return res.json();
