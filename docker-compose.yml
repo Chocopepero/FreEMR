@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   frontend:
     build:
@@ -9,12 +7,14 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/usr/src/app
+      - ./frontend:/usr/src/app:rw
       - /usr/src/app/node_modules
     depends_on:
       - backend
-    environment:
-      - NODE_ENV=development
+    networks:
+      - freemr-network
+    env_file:
+      - .env
     command: ["npm", "run", "dev"]
 
   backend:
@@ -25,7 +25,12 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/usr/src/app
-    environment:
-      - PYTHONUNBUFFERED=1
+      - ./backend:/usr/src/app:rw
+    env_file:
+      - .env
+    networks:
+      - freemr-network
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+networks:
+  freemr-network:
+    driver: bridge
