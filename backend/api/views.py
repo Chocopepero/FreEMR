@@ -14,4 +14,17 @@ def application_data(request):
         "version": "1.0.0",
         "description": "This is CORS Test Data."
     }
+
     return JsonResponse(data)
+
+@api_view(['POST'])
+def submit_form(request):
+    serializer = FormDataSerializer(data=request.data)
+    if serializer.is_valid():
+        
+        #TODO: Save form data to database
+        print(serializer.data)
+        
+        
+        return Response({'message': 'Form submitted successfully'}, status=200)
+    return Response(serializer.errors, status=400)
