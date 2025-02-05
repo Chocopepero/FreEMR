@@ -37,15 +37,24 @@ const FormComponent = () => {
     try {
       const response = await fetch('http://localhost:8000/api/submit-form/', {
         method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
+
+      console.log('Response:', response); // Log the response
+
       if (response.ok) {
+        const data = await response.json(); // Parse the response body
+        console.log('Response data:', data); // Log the response data
         alert('Form submitted successfully');
       } else {
         alert('Failed to submit form');
+        const errorData = await response.json(); // Parse the error response body
+        console.error('Error data:', errorData); // Log the error data
       }
     } catch (error) {
       console.error('Error submitting form:', error);

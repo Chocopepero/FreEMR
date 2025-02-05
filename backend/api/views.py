@@ -4,6 +4,8 @@ from django.conf import settings
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .serializers import PatientSerializer
+
 
 # Create your views here.
 
@@ -19,12 +21,9 @@ def application_data(request):
 
 @api_view(['POST'])
 def submit_form(request):
-    serializer = FormDataSerializer(data=request.data)
+    print(request.data)
+    serializer = PatientSerializer(data=request.data)
     if serializer.is_valid():
-        
-        #TODO: Save form data to database
-        print(serializer.data)
-        
-        
+        serializer.save()
         return Response({'message': 'Form submitted successfully'}, status=200)
     return Response(serializer.errors, status=400)
