@@ -1,6 +1,5 @@
 from django.urls import path
 from .views import application_data
-
 from .views import submit_form
 
 urlpatterns = [

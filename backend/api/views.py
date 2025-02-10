@@ -16,7 +16,6 @@ def application_data(request):
         "version": "1.0.0",
         "description": "This is CORS Test Data."
     }
-
     return JsonResponse(data)
 
 @api_view(['POST'])
