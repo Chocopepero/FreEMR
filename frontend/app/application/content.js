@@ -1,20 +1,52 @@
 "use client";
 
+import FormComponent from '../components/FormComponent';
+import DisplayPatient from '../components/DisplayPatient';
 import React, { useState } from 'react';
 
-async function fetchData() {
-  const res = await fetch(`${process.env.APP_BACKEND_URL}/api/application-data`, {
-    cache: "no-store", // Ensure fresh data on each load
-  });
-  return res.json();
-}
-
 export default function ApplicationContent() {
-  const [selectedButton, setSelectedButton] = useState(null);
+  const [patientId, setPatientId] = useState('');
+  const [selectedButton, setSelectedButton] = useState('Button 1');
 
   const handleButtonClick = (button) => {
-    setSelectedButton(button);
   };
+  
+  const handleInputChange = (e) => {
+    setPatientId(e.target.value);
+  };
+
+
+  function getContentForButton(selectedButton) {
+    if (selectedButton === 'Button 1') {
+      return (
+        <div className="flex">
+          <div className="bg-blue-500 h-screen">
+            {/* 
+          This component includes a top side margin in components/styles.module.css
+          If we want to remove that, delete the style and use tailwind in-line css 
+          */}
+            <FormComponent />
+          </div>
+          <div className="w-1/2 h-screen bg-gray-500">
+            <input
+              type="text"
+              value={patientId}
+              onChange={handleInputChange}
+              placeholder="Enter Patient ID"
+              className="p-2 m-2 border border-gray-300"
+            />
+            {patientId && <DisplayPatient patientId={patientId} />}
+          </div>
+        </div>)
+    } else if (selectedButton === 'Button 2') {
+      return (
+        <div className="bg-gray-500 h-screen">
+
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="flex">
@@ -27,9 +59,7 @@ export default function ApplicationContent() {
         </div>
       </div>
       <div className="w-5/6 h-screen bg-green-300">
-        {selectedButton === 'Button 1' && <h1>Content for Button 1</h1>}
-        {selectedButton === 'Button 2' && <h1>Content for Button 2</h1>}
-        {!selectedButton && <h1>Test</h1>}
+        {getContentForButton(selectedButton)}
       </div>
     </div>
   );

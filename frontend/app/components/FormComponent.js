@@ -35,7 +35,7 @@ const FormComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/submit-form/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-form/`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',

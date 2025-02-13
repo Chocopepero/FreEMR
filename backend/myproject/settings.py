@@ -28,7 +28,18 @@ DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS').split(',')
+# CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS').split(',')
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'x-requested-with',
+    'accept',
+    'origin',
+    'authorization',
+    'x-csrftoken',
+]
 
 
 # Application definition
