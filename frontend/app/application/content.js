@@ -2,6 +2,7 @@
 
 import FormComponent from '../components/FormComponent';
 import DisplayPatient from '../components/DisplayPatient';
+import MedicationDisplay from '../components/MedicationDisplay';
 import React, { useState } from 'react';
 
 export default function ApplicationContent() {
@@ -27,16 +28,15 @@ export default function ApplicationContent() {
           */}
             <FormComponent />
           </div>
-          <div className="w-1/2 h-screen bg-gray-500">
-            <input
+          <MedicationDisplay />
+            {/* <input
               type="text"
               value={patientId}
               onChange={handleInputChange}
               placeholder="Enter Patient ID"
               className="p-2 m-2 border border-gray-300"
-            />
-            {patientId && <DisplayPatient patientId={patientId} />}
-          </div>
+            /> */}
+            {/* {patientId && <DisplayPatient patientId={patientId} />} */}
         </div>)
     } else if (selectedButton === 'Button 2') {
       return (
