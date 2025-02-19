@@ -7,18 +7,19 @@ import React, { useState } from 'react';
 
 export default function ApplicationContent() {
   const [patientId, setPatientId] = useState('');
-  const [selectedButton, setSelectedButton] = useState('Button 1');
+  const [selectedButton, setSelectedButton] = useState('Patient Info');
 
   const handleButtonClick = (button) => {
+    setSelectedButton(button);
   };
-  
+
   const handleInputChange = (e) => {
     setPatientId(e.target.value);
   };
 
 
   function getContentForButton(selectedButton) {
-    if (selectedButton === 'Button 1') {
+    if (selectedButton === 'Patient Info') {
       return (
         <div className="flex">
           <div className="bg-blue-500 h-screen">
@@ -29,19 +30,21 @@ export default function ApplicationContent() {
             <FormComponent />
           </div>
           <MedicationDisplay />
-            {/* <input
+          {/* <input
               type="text"
               value={patientId}
               onChange={handleInputChange}
               placeholder="Enter Patient ID"
               className="p-2 m-2 border border-gray-300"
             /> */}
-            {/* {patientId && <DisplayPatient patientId={patientId} />} */}
+          {/* {patientId && <DisplayPatient patientId={patientId} />} */}
         </div>)
-    } else if (selectedButton === 'Button 2') {
+    } else if (selectedButton === 'Notes') {
       return (
-        <div className="bg-gray-500 h-screen">
-
+        <div className="bg-gray-500 h-screen flex flex-col justify-center items-center">
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
         </div>
       );
     }
@@ -51,11 +54,11 @@ export default function ApplicationContent() {
   return (
     <div className="flex">
       <div className="w-1/6 h-screen content-center justify-center justify-items-center bg-red-300">
-        <div className="p-4 bg-blue-200" onClick={() => handleButtonClick('Button 1')}>
-          Button 1
+        <div className="text-gray-700 p-4 bg-blue-200" onClick={() => handleButtonClick('Patient Info')}>
+          Patient Info
         </div>
-        <div className="mt-4 p-4 bg-blue-400" onClick={() => handleButtonClick('Button 2')}>
-          Button 2
+        <div className="text-gray-700 mt-4 p-4 bg-blue-400" onClick={() => handleButtonClick('Notes')}>
+          Notes
         </div>
       </div>
       <div className="w-5/6 h-screen bg-green-300">
