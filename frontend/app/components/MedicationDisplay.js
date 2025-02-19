@@ -102,7 +102,7 @@ const MedicationDisplay = () => {
                                 value={newRow.start}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="Im just testin bro"
+                                placeholder="0000 - 2349"
                             />
                         </div>
                         <div className="mb-4">
@@ -113,7 +113,7 @@ const MedicationDisplay = () => {
                                 value={newRow.stop}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="Im just testin bro"
+                                placeholder="0000 - 2349"
                             />
                         </div>
                         <div className="mb-4">
@@ -124,7 +124,7 @@ const MedicationDisplay = () => {
                                 value={newRow.medication}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="Im just testin bro"
+                                placeholder="Medication Name"
                             />
                         </div>
                         <div className="flex justify-end">
