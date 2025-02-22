@@ -35,3 +35,4 @@ def get_patient(request, patient_id):
     serializer = PatientSerializer(patient)
     return Response(serializer.data, status=200)
 
+
