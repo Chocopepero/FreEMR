@@ -2,7 +2,7 @@
 
 import FormComponent from '../components/FormComponent';
 import DisplayPatient from '../components/DisplayPatient';
-import MedicationDisplay from '../components/MedicationDisplay';
+import { MedicationInput } from '../components/MedicationDisplay';
 import React, { useState } from 'react';
 
 export default function ApplicationContent() {
@@ -29,7 +29,7 @@ export default function ApplicationContent() {
           */}
             <FormComponent />
           </div>
-          <MedicationDisplay />
+          <MedicationInput />
           {/* <input
               type="text"
               value={patientId}
@@ -42,9 +42,9 @@ export default function ApplicationContent() {
     } else if (selectedButton === 'Notes') {
       return (
         <div className="bg-gray-500 h-screen flex flex-col justify-center items-center">
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4"/>
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
+          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
         </div>
       );
     }
@@ -54,10 +54,10 @@ export default function ApplicationContent() {
   return (
     <div className="flex">
       <div className="w-1/6 h-screen content-center justify-center justify-items-center bg-red-300">
-        <div className="text-gray-700 p-4 bg-blue-200" onClick={() => handleButtonClick('Patient Info')}>
+        <div className="text-gray-700 p-4 bg-blue-200 w-full" onClick={() => handleButtonClick('Patient Info')}>
           Patient Info
         </div>
-        <div className="text-gray-700 mt-4 p-4 bg-blue-400" onClick={() => handleButtonClick('Notes')}>
+        <div className="text-gray-700 mt-4 p-4 bg-blue-400 w-full" onClick={() => handleButtonClick('Notes')}>
           Notes
         </div>
       </div>
