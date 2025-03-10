@@ -1,13 +1,57 @@
 "use client";
-
+import React, { useState } from 'react';
 import FormComponent from '../components/FormComponent';
 import DisplayPatient from '../components/DisplayPatient';
+import NotesComponent from '../components/NotesComponent';
 import { MedicationInput } from '../components/MedicationDisplay';
-import React, { useState } from 'react';
 
 export default function ApplicationContent() {
   const [patientId, setPatientId] = useState('');
   const [selectedButton, setSelectedButton] = useState('Patient Info');
+  const [formData, setFormData] = useState({
+    scenario_id: "",
+    name: "",
+    description: "",
+    patient: {
+      patient_id: "",
+      name: "",
+      dob: "",
+      sex: "",
+      room_num: "",
+      height: "",
+      weight: ""
+    },
+    medications: [],
+    notes: []
+  });
+
+  const addMedication = (newRow) => {
+    setFormData((prev) => ({
+      ...prev,
+      medications: [...prev.medications, { ...newRow, id: prev.medications.length + 1 }],
+    }));
+  };
+
+  const removeMedication = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      medications: prev.medications.filter((row) => row.id !== id),
+    }));
+  };
+
+  const addNote = (newNote) => {
+    setFormData((prev) => ({
+      ...prev,
+      notes: [...prev.notes, newNote],
+    }));
+  };
+  
+  const removeNote = (noteId) => {
+    setFormData((prev) => ({
+      ...prev,
+      notes: prev.notes.filter((note) => note.id !== noteId),
+    }));
+  };
 
   const handleButtonClick = (button) => {
     setSelectedButton(button);
@@ -17,34 +61,43 @@ export default function ApplicationContent() {
     setPatientId(e.target.value);
   };
 
+  // TODO: Implement this function, currently boilerplate
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('/api/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      console.log('Success:', data);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   function getContentForButton(selectedButton) {
     if (selectedButton === 'Patient Info') {
       return (
         <div className="flex">
           <div className="bg-blue-500 h-screen">
-            {/* 
-          This component includes a top side margin in components/styles.module.css
-          If we want to remove that, delete the style and use tailwind in-line css 
-          */}
             <FormComponent />
           </div>
-          <MedicationInput />
-          {/* <input
-              type="text"
-              value={patientId}
-              onChange={handleInputChange}
-              placeholder="Enter Patient ID"
-              className="p-2 m-2 border border-gray-300"
-            /> */}
-          {/* {patientId && <DisplayPatient patientId={patientId} />} */}
-        </div>)
+          <MedicationInput
+            rows={formData.medications}
+            addRow={addMedication}
+            removeRow={removeMedication} />
+        </div>
+      );
     } else if (selectedButton === 'Notes') {
       return (
         <div className="bg-gray-500 h-screen flex flex-col justify-center items-center">
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
-          <textarea className="resize-none rounded m-4 p-4 w-3/4 h-1/4" />
+          <NotesComponent addNote={addNote} removeNote={removeNote} notes={formData.notes} />
         </div>
       );
     }
@@ -60,6 +113,7 @@ export default function ApplicationContent() {
         <div className="text-gray-700 mt-4 p-4 bg-blue-400 w-full" onClick={() => handleButtonClick('Notes')}>
           Notes
         </div>
+        <button onClick={handleSubmit} className="p-2 m-2 bg-blue-500 text-white">Submit</button>
       </div>
       <div className="w-5/6 h-screen bg-green-300">
         {getContentForButton(selectedButton)}
