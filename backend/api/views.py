@@ -20,7 +20,7 @@ def application_data(request):
     return JsonResponse(data)
 
 @api_view(['POST'])
-def submit_form(request):
+def submit_patient(request):
     print(request.data)
     serializer = PatientSerializer(data=request.data)
     if serializer.is_valid():
