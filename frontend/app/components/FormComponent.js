@@ -14,22 +14,10 @@ const FormField = ({ type, name, value, onChange, placeholder, required }) => (
 );
 
 
-const FormComponent = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    dob: '',
-    sex: '',
-    patient_id: '',
-    room_num: '',
-    height: '',
-    weight: ''
-  });
-
+const FormComponent = ({ formData, onFormChange }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({...formData,
-      [name]: value,
-    });
+    onFormChange(name, value);
   };
 
   const handleSubmit = async (e) => {

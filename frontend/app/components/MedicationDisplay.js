@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 const MedicationInput = ({ rows, addRow, removeRow }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newRow, setNewRow] = useState({
+        ndc: "",
         start: "",
         stop: "",
         medication: "",
@@ -25,6 +26,7 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
     const handleAddRow = () => {
         addRow(newRow);
         setNewRow({
+            ndc: "",
             start: "",
             stop: "",
             medication: "",
@@ -44,17 +46,16 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
             <table className="bg-gray-500 w-full h-fit border-collapse table-fixed border-spacing-3">
                 <thead>
                     <tr>
+                        <th className="border w-3/12">Medication ID</th>
                         <th className="border w-1/12">Start</th>
                         <th className="border w-1/12">Stop</th>
                         <th className="border w-7/12">Medication</th>
-                        <th className="border w-1/12">Time</th>
-                        <th className="border w-1/12">Initial</th>
-                        <th className="border w-1/12">Site</th>
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((row) => (
                         <tr key={row.id}>
+                            <td className="border">{row.ndc}</td>
                             <td className="border">{row.start}</td>
                             <td className="border">{row.stop}</td>
                             <td className="border flex justify-between items-center">{row.medication}
@@ -63,9 +64,6 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
                                     onClick={() => removeRow(row.id)}
                                 >This is a button</button>
                             </td>
-                            <td className="border">{row.time}</td>
-                            <td className="border">{row.initial}</td>
-                            <td className="border">{row.site}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -81,6 +79,17 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
                     <div className="bg-white p-6 rounded shadow-md w-96">
                         <h2 className="text-xl font-bold text-black mb-4">Add Medication</h2>
                         <div className="mb-4">
+                            <label className="block text-gray-700">Medication ID</label>
+                            <input
+                                type="text"
+                                name="ndc"
+                                value={newRow.ndc}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded text-black"
+                                placeholder="Medication ID"
+                            />
+                        </div>
+                        <div className="mb-4">
                             <label className="block text-gray-700">Start</label>
                             <input
                                 type="number"
@@ -90,7 +99,7 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
                                 value={newRow.start}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="0000 - 2349"
+                                placeholder="0000 - 2359"
                             />
                         </div>
                         <div className="mb-4">
@@ -101,7 +110,7 @@ const MedicationInput = ({ rows, addRow, removeRow }) => {
                                 value={newRow.stop}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="0000 - 2349"
+                                placeholder="0000 - 2359"
                             />
                         </div>
                         <div className="mb-4">

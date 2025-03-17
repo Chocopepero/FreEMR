@@ -19,9 +19,9 @@ class Medication(models.Model):
     medication = models.CharField(max_length=100, primary_key=True)
     start = models.IntegerField(validators=[MinValueValidator(0)])
     stop = models.IntegerField(validators=[MinValueValidator(0)])
-    time = models.IntegerField(validators=[MinValueValidator(0)])
-    initial = models.CharField(max_length=5)
-    site = models.CharField(max_length=5)
+    time = models.IntegerField(blank=True, null=True)
+    initial = models.CharField(max_length=5, blank=True, null=True)
+    site = models.CharField(max_length=5, blank=True, null=True)
 
     def __str__(self):
         return f"({self.medication})"

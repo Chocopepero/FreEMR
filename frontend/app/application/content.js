@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FormComponent from '../components/FormComponent';
 import DisplayPatient from '../components/DisplayPatient';
 import NotesComponent from '../components/NotesComponent';
@@ -24,6 +24,20 @@ export default function ApplicationContent() {
     medications: [],
     notes: []
   });
+
+  useEffect(() => {
+    console.log('Current state:', { selectedButton, formData });
+  }, [selectedButton, formData]);
+
+  const handleFormChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      patient: {
+        ...prev.patient,
+        [name]: value
+      }
+    }));
+  };
 
   const addMedication = (newRow) => {
     setFormData((prev) => ({
@@ -64,7 +78,7 @@ export default function ApplicationContent() {
   // TODO: Implement this function, currently boilerplate
   const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/submit', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +100,7 @@ export default function ApplicationContent() {
       return (
         <div className="flex">
           <div className="bg-blue-500 h-screen">
-            <FormComponent />
+            <FormComponent formData={formData.patient} onFormChange={handleFormChange}/>
           </div>
           <MedicationInput
             rows={formData.medications}
