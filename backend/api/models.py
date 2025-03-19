@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your models here.
 class Patient(models.Model):
@@ -26,10 +28,20 @@ class Medication(models.Model):
     def __str__(self):
         return f"({self.medication})"
     
+def get_global_user():
+    try:
+        # Try to get the global user; adjust the username as needed.
+        global_user = User.objects.get(username='global')
+    except ObjectDoesNotExist:
+        # If the global user doesn't exist, create it. You might want to do this in a data migration instead.
+        global_user = User.objects.create_user(username='global', password='somepassword')
+    return global_user.pk
+    
 class Scenario(models.Model):
     scenario_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
+    owner = models.ForeignKey(User, related_name='scenarios', on_delete=models.CASCADE, default=get_global_user)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
 

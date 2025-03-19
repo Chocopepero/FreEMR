@@ -1,10 +1,10 @@
 import api
 from django.http import JsonResponse
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import PatientSerializer, ScenarioSerializer, MedicationSerializer
@@ -162,3 +162,15 @@ def logout_view(request):
     auth_request = getattr(request, '_request', request)
     logout(auth_request)
     return JsonResponse({'success': True, 'message': 'Logged out successfully'})
+
+@login_required
+def scenario_data(request):
+    user = request.user
+    global_user = User.objects.get(username='global')
+    scenarios = list(user.scenarios.values()) + list(global_user.scenarios.values())
+    medications = list(user.medications.values()) + list(global_user.medications.values())
+    
+    return JsonResponse({
+        'scenarios': scenarios,
+        'medications': medications,
+    })

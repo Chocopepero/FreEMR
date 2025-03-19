@@ -70,11 +70,6 @@ export default function ApplicationContent() {
     setSelectedButton(button);
   };
 
-  const handleInputChange = (e) => {
-    setPatientId(e.target.value);
-  };
-
-  // TODO: Implement this function, currently boilerplate
   const handleSubmit = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
@@ -98,7 +93,7 @@ export default function ApplicationContent() {
     if (selectedButton === 'Patient Info') {
       return (
         <div className="flex">
-          <div className="bg-blue-500 h-screen">
+          <div className="bg-blue-500">
             <FormComponent formData={formData.patient} onFormChange={handleFormChange}/>
           </div>
           <MedicationInput
@@ -109,7 +104,7 @@ export default function ApplicationContent() {
       );
     } else if (selectedButton === 'Notes') {
       return (
-        <div className="bg-gray-500 h-screen flex flex-col justify-center items-center">
+        <div className="bg-gray-500 flex flex-col justify-center items-center">
           <NotesComponent addNote={addNote} removeNote={removeNote} notes={formData.notes} />
         </div>
       );
@@ -118,8 +113,8 @@ export default function ApplicationContent() {
   }
 
   return (
-    <div className="flex">
-      <div className="w-1/6 h-screen content-center justify-center justify-items-center bg-red-300">
+    <div className="flex-grow flex h-[calc(100vh-80px)]">
+      <div className="w-1/6 content-center justify-center justify-items-center bg-red-300 sticky top-16 h-[calc(100vh-80px)] overflow-y-auto">
         <div className="text-gray-700 p-4 bg-blue-200 w-full" onClick={() => handleButtonClick('Patient Info')}>
           Patient Info
         </div>
@@ -128,7 +123,7 @@ export default function ApplicationContent() {
         </div>
         <button onClick={handleSubmit} className="p-2 m-2 bg-blue-500 text-white">Submit</button>
       </div>
-      <div className="w-5/6 h-screen bg-green-300">
+      <div className="w-5/6 bg-green-300 overflow-y-auto">
         {getContentForButton(selectedButton)}
       </div>
     </div>

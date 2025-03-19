@@ -1,13 +1,13 @@
-import NavBar from "../components/NavBar";
+'use client';
 
-export default function ScenarioPage() {
+import withAuth from '../components/AuthComponent';
+
+function ScenarioPage() {
     return (
-        <div>       
-            <NavBar />
             <div className="w-full h-xl bg-red-300 p-4">
                 Test
             </div>
-        </div>
-
     );
 }
+
+export default withAuth(ScenarioPage);
