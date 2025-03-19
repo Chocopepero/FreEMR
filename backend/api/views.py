@@ -1,4 +1,5 @@
 import api
+from django.db.models import Q
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -8,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import PatientSerializer, ScenarioSerializer, MedicationSerializer
-from .models import Patient
+from .models import Patient, Scenario, Medication
 from datetime import datetime
 
 
@@ -165,12 +166,16 @@ def logout_view(request):
 
 @login_required
 def scenario_data(request):
-    user = request.user
-    global_user = User.objects.get(username='global')
-    scenarios = list(user.scenarios.values()) + list(global_user.scenarios.values())
-    medications = list(user.medications.values()) + list(global_user.medications.values())
-    
+    user = request.user.id
+    print(user)
+
+    # Fetch scenarios owned by the user or the global user
+    scenarios = Scenario.objects.filter(
+        Q(owner=user) | Q(owner__username='global')
+    ).values(
+        'scenario_id', 'name', 'description', 'patient', 'medication'
+    )
+
     return JsonResponse({
-        'scenarios': scenarios,
-        'medications': medications,
+        'scenarios': list(scenarios),
     })
