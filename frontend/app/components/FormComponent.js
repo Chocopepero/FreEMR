@@ -1,3 +1,4 @@
+'use client'
 import styles from './styles.module.css'
 import { useState } from 'react';
 
@@ -13,8 +14,18 @@ const FormField = ({ type, name, value, onChange, placeholder, required }) => (
   />
 );
 
-
-const FormComponent = ({ formData, onFormChange }) => {
+const FormComponent = ({
+  formData = {
+    name: '',
+    dob: '',
+    sex: '',
+    patient_id: '',
+    room_num: '',
+    height: '',
+    weight: '',
+  },
+  onFormChange = () => {}
+}) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     onFormChange(name, value);
@@ -106,7 +117,7 @@ const FormComponent = ({ formData, onFormChange }) => {
           name="weight"
           value={formData.weight}
           onChange={handleChange}
-          placeholder= "Weight"
+          placeholder="Weight"
           required
         />
         <button className={styles.submitbutton} type="submit">Submit</button>
