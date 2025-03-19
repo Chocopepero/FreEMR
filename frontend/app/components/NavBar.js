@@ -73,7 +73,7 @@ const NavBar = () => {
     return (
         <div className='topbar flex justify-between items-center bg-blue-500'>
             <div className="text-xl text-left py-4 pl-4 w-1/3">
-                FreMR
+                FreEMR
             </div>
             <div className='w-1/3' />
             <div className='w-1/3 flex justify-end items-center py-4 pr-4'>

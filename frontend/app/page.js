@@ -6,7 +6,7 @@ export default function Home() {
     <div>
       <NavBar />
       <h1>Welcome</h1>
-      <Link href="/application">
+      <Link href="/scenario">
         <button>Open Application</button>
       </Link>
     </div>
