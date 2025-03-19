@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import FormComponent from '../components/FormComponent';
-import DisplayPatient from '../components/DisplayPatient';
-import NotesComponent from '../components/NotesComponent';
-import { MedicationInput } from '../components/MedicationDisplay';
+import FormComponent from '../../components/FormComponent';
+import NotesComponent from '../../components/NotesComponent';
+import { MedicationInput } from '../../components/MedicationDisplay';
 
 export default function ApplicationContent() {
   const [patientId, setPatientId] = useState('');
