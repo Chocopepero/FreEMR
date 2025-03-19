@@ -70,12 +70,30 @@ export default function ApplicationContent() {
     setSelectedButton(button);
   };
 
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
   const handleSubmit = async () => {
+    const csrfToken = getCookie('csrftoken');
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify(formData),
       });
@@ -91,41 +109,67 @@ export default function ApplicationContent() {
 
   function getContentForButton(selectedButton) {
     if (selectedButton === 'Patient Info') {
-      return (
-        <div className="flex">
-          <div className="bg-blue-500">
-            <FormComponent formData={formData.patient} onFormChange={handleFormChange}/>
-          </div>
-          <MedicationInput
-            rows={formData.medications}
-            addRow={addMedication}
-            removeRow={removeMedication} />
-        </div>
-      );
+        return (
+            <div className="flex">
+                <div className="bg-blue-500">
+                    <FormComponent formData={formData.patient} onFormChange={handleFormChange} />
+                </div>
+                <MedicationInput
+                    rows={formData.medications}
+                    addRow={addMedication}
+                    removeRow={removeMedication} />
+            </div>
+        );
     } else if (selectedButton === 'Notes') {
-      return (
-        <div className="bg-gray-500 flex flex-col justify-center items-center">
-          <NotesComponent addNote={addNote} removeNote={removeNote} notes={formData.notes} />
-        </div>
-      );
+        return (
+            <div className="bg-gray-500 flex flex-col justify-center items-center">
+                <NotesComponent addNote={addNote} removeNote={removeNote} notes={formData.notes} />
+            </div>
+        );
+    } else if (selectedButton === 'Scenario Info') {
+        return (
+            <div className="bg-yellow-500 flex flex-col justify-center items-center p-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">
+                    Scenario Name:
+                </label>
+                <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+                <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">
+                    Scenario Description:
+                </label>
+                <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                />
+            </div>
+        );
     }
     return null;
-  }
+}
 
-  return (
+return (
     <div className="flex-grow flex h-[calc(100vh-80px)]">
-      <div className="w-1/6 content-center justify-center justify-items-center bg-red-300 sticky top-16 h-[calc(100vh-80px)] overflow-y-auto">
-        <div className="text-gray-700 p-4 bg-blue-200 w-full" onClick={() => handleButtonClick('Patient Info')}>
-          Patient Info
+        <div className="w-1/6 content-center justify-center justify-items-center bg-red-300 sticky top-16 h-[calc(100vh-80px)] overflow-y-auto">
+        <div className="text-gray-700 p-4 bg-blue-600 w-full" onClick={() => handleButtonClick('Scenario Info')}>
+                Scenario Info
+            </div>
+            <div className="text-gray-700 mt-4 p-4 bg-blue-200 w-full" onClick={() => handleButtonClick('Patient Info')}>
+                Patient Info
+            </div>
+            <div className="text-gray-700 mt-4 p-4 bg-blue-400 w-full" onClick={() => handleButtonClick('Notes')}>
+                Notes
+            </div>
+
+            <button onClick={handleSubmit} className="p-2 m-2 bg-blue-500 text-white">Submit</button>
         </div>
-        <div className="text-gray-700 mt-4 p-4 bg-blue-400 w-full" onClick={() => handleButtonClick('Notes')}>
-          Notes
+        <div className="w-5/6 bg-green-300 overflow-y-auto">
+            {getContentForButton(selectedButton)}
         </div>
-        <button onClick={handleSubmit} className="p-2 m-2 bg-blue-500 text-white">Submit</button>
-      </div>
-      <div className="w-5/6 bg-green-300 overflow-y-auto">
-        {getContentForButton(selectedButton)}
-      </div>
     </div>
-  );
+);
 }

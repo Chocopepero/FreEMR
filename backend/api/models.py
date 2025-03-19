@@ -17,8 +17,8 @@ class Patient(models.Model):
         return f"{self.name} ({self.patient_id})"
     
 class Medication(models.Model):
-    id = models.IntegerField()
-    medication = models.CharField(max_length=100, primary_key=True)
+    id = models.IntegerField(primary_key=True)
+    medication = models.CharField(max_length=100)
     start = models.IntegerField(validators=[MinValueValidator(0)])
     stop = models.IntegerField(validators=[MinValueValidator(0)])
     time = models.IntegerField(blank=True, null=True)

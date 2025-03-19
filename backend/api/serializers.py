@@ -10,6 +10,9 @@ class ScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scenario
         fields = '__all__'
+        extra_kwargs = {
+            'medication': {'required': False}
+        }
 
 class MedicationSerializer(serializers.ModelSerializer):
     class Meta:

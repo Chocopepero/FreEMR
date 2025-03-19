@@ -28,7 +28,7 @@ const NavBar = () => {
                 const res = await fetch(
                     `${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/current_user/`,
                     {
-                        credentials: 'include', // Ensure cookies (and session) are sent
+                        credentials: 'include',
                     }
                 );
 
