@@ -43,7 +43,19 @@ class Scenario(models.Model):
     description = models.CharField(max_length=1000)
     owner = models.ForeignKey(User, related_name='scenarios', on_delete=models.CASCADE, default=get_global_user)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    medication = models.ManyToManyField(Medication)
+    medication = models.ManyToManyField(Medication, through='Scenario_Medication')
 
     def __str__(self):
         return f"{self.name} ({self.scenario_id})"
+    
+
+class Scenario_Medication(models.Model):
+    scenario = models.ForeignKey(Scenario, on_delete=models.CASCADE)
+    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)  # Tie the medication to the scenario owner
+
+    class Meta:
+        unique_together = ('scenario', 'medication')  # Prevent duplicate entries
+
+    def __str__(self):
+        return f"Scenario: {self.scenario.name}, Medication: {self.medication.medication}, Owner: {self.owner.username}"

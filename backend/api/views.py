@@ -10,8 +10,9 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import PatientSerializer, ScenarioSerializer, MedicationSerializer
-from .models import Patient, Scenario, Medication
+from .models import Patient, Scenario, Medication, Scenario_Medication
 from datetime import datetime
+from django.db import transaction
 
 
 # Create your views here.
@@ -58,79 +59,84 @@ def submit_scenario(request):
     patient_data = data.pop('patient')
     medications_data = data.pop('medications')
 
-    # Handle patient data
-    if 'dob' in patient_data:
-        try:
-            patient_data['dob'] = datetime.strptime(patient_data['dob'], '%Y-%m-%d').date()
-        except ValueError as e:
-            print(f"Error parsing dob: {e}")
-            return Response({'error': 'Invalid date format for dob'}, status=400)
-
-    try:
-        patient = Patient.objects.get(patient_id=patient_data['patient_id'])
-    except Patient.DoesNotExist:
-        patient_serializer = PatientSerializer(data=patient_data)
-        if patient_serializer.is_valid():
-            patient = patient_serializer.save()
-        else:
-            print(f"Patient serializer errors: {patient_serializer.errors}")
-            return Response(patient_serializer.errors, status=400)
-
-    # Handle medications
-    medication_ids = []
-    for med_data in medications_data:
-        if 'ndc' not in med_data:
-            return Response({'error': 'Missing ndc field in medication data'}, status=400)
+    with transaction.atomic():
+        if 'dob' in patient_data:
+            try:
+                patient_data['dob'] = datetime.strptime(patient_data['dob'], '%Y-%m-%d').date()
+            except ValueError as e:
+                print(f"Error parsing dob: {e}")
+                return Response({'error': 'Invalid date format for dob'}, status=400)
 
         try:
-            med_data['id'] = int(med_data.pop('ndc'))  # Convert ndc to an integer
-        except ValueError:
-            return Response({'error': 'Invalid ndc format, must be an integer'}, status=400)
-
-        if 'time' in med_data:
-            if med_data['time'] == '':
-                med_data['time'] = None
+            patient = Patient.objects.get(patient_id=patient_data['patient_id'])
+        except Patient.DoesNotExist:
+            patient_serializer = PatientSerializer(data=patient_data)
+            if patient_serializer.is_valid():
+                patient = patient_serializer.save()
             else:
-                try:
-                    med_data['time'] = int(med_data['time'])
-                except ValueError:
-                    return Response({'error': f"Invalid time format: {med_data['time']}"}, status=400)
+                print(f"Patient serializer errors: {patient_serializer.errors}")
+                return Response(patient_serializer.errors, status=400)
 
-        medication, created = Medication.objects.get_or_create(
-            id=med_data['id'],
-            defaults={
-                'medication': med_data.get('medication'),
-                'start': med_data.get('start'),
-                'stop': med_data.get('stop'),
-                'time': med_data.get('time'),
-                'initial': med_data.get('initial'),
-                'site': med_data.get('site'),
-            }
-        )
-        medication_ids.append(medication.id)
+        medication_ids = []
+        for med_data in medications_data:
+            if 'ndc' not in med_data:
+                return Response({'error': 'Missing ndc field in medication data'}, status=400)
 
-    # Create the scenario without medications
-    scenario_data = {
-        "scenario_id": generate_unique_scenario_id(),
-        "owner": request.user.id,
-        "name": data.get("name"),
-        "description": data.get("description"),
-        "patient": patient.patient_id,
-    }
-    scenario_serializer = ScenarioSerializer(data=scenario_data)
-    if scenario_serializer.is_valid():
-        scenario = scenario_serializer.save()
-    else:
-        print(f"Scenario serializer errors: {scenario_serializer.errors}")
-        return Response(scenario_serializer.errors, status=400)
+            try:
+                med_data['id'] = int(med_data.pop('ndc')) 
+            except ValueError:
+                return Response({'error': 'Invalid ndc format, must be an integer'}, status=400)
 
-    # Add medications to the scenario
-    for med_id in medication_ids:
-        try:
-            medication = Medication.objects.get(id=med_id)
-            scenario.medication.add(medication)
-        except Medication.DoesNotExist:
-            return Response({'error': f'Medication with id {med_id} does not exist'}, status=400)
+            if 'time' in med_data:
+                if med_data['time'] == '':
+                    med_data['time'] = None
+                else:
+                    try:
+                        med_data['time'] = int(med_data['time'])
+                    except ValueError:
+                        return Response({'error': f"Invalid time format: {med_data['time']}"}, status=400)
+
+            try:
+                medication, created = Medication.objects.get_or_create(
+                    id=med_data['id'],
+                    defaults={
+                        'medication': med_data.get('medication'),
+                        'start': med_data.get('start'),
+                        'stop': med_data.get('stop'),
+                        'time': med_data.get('time'),
+                        'initial': med_data.get('initial'),
+                        'site': med_data.get('site'),
+                    }
+                )
+                medication_ids.append(medication.id)
+            except Exception as e:
+                print(f"Error creating medication: {e}")
+                return Response({'error': f"Failed to process medication: {med_data}"}, status=400)
+
+        scenario_data = {
+            "scenario_id": generate_unique_scenario_id(),
+            "owner": request.user.id,
+            "name": data.get("name"),
+            "description": data.get("description"),
+            "patient": patient.patient_id,
+        }
+        scenario_serializer = ScenarioSerializer(data=scenario_data)
+        if scenario_serializer.is_valid():
+            scenario = scenario_serializer.save()
+        else:
+            print(f"Scenario serializer errors: {scenario_serializer.errors}")
+            return Response(scenario_serializer.errors, status=400)
+
+        for med_id in medication_ids:
+            try:
+                medication = Medication.objects.get(id=med_id)
+                Scenario_Medication.objects.create(
+                    scenario=scenario,
+                    medication=medication,
+                    owner=request.user
+                )
+            except Medication.DoesNotExist:
+                return Response({'error': f'Medication with id {med_id} does not exist'}, status=400)
 
     return Response({'message': 'Form submitted successfully'}, status=200)
 
