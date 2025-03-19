@@ -43,7 +43,7 @@ class Scenario(models.Model):
     description = models.CharField(max_length=1000)
     owner = models.ForeignKey(User, related_name='scenarios', on_delete=models.CASCADE, default=get_global_user)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    medication = models.ManyToManyField(Medication)
 
     def __str__(self):
         return f"{self.name} ({self.scenario_id})"
