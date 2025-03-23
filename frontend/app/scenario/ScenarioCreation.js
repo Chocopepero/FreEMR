@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import FormComponent from '../components/FormComponent';
 import NotesComponent from '../components/NotesComponent';
 import { MedicationInput } from '../components/MedicationDisplay';
+import { useRouter } from 'next/navigation';
 
 // Scenario_ID for editing. If nothing is passed it, set to null and disregard it.
 export default function ScenarioCreation({ scenarioId = null }) {
+  const router = useRouter();
   const [selectedButton, setSelectedButton] = useState('Patient Info');
   const [formData, setFormData] = useState({
     scenario_id: "",
@@ -72,7 +74,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
           scenario_id: data.scenario_id || "",
           name: data.name || "",
           description: data.description || "",
-          medications: Array.isArray(data.medications) ? data.medications : [],
+          medications: Array.isArray(data.medication) ? data.medication : [],
           notes: Array.isArray(data.notes) ? data.notes : [],
         }));
       } catch (error) {

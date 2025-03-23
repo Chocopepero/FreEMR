@@ -1,18 +1,13 @@
-import api
-import uuid
-from django.db.models import Q
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from ..serializers import PatientSerializer, ScenarioSerializer, MedicationSerializer
-from ..models import Patient, Scenario, Medication, Scenario_Medication
-from datetime import datetime
-from django.db import transaction
+from ..serializers import PatientSerializer
+from ..models import Patient
+
 
 
 # Create your views here.
