@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 // Medication Output is to be used for scenarios.
 // The main difference between them is that Medication Input has a button to add a new row and a button to remove a row.
 
-const MedicationInput = ({ rows, addRow, removeRow }) => {
+const MedicationInput = ({ rows = [], addRow, removeRow }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newRow, setNewRow] = useState({
         ndc: "",

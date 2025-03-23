@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import withAuth from '../components/AuthComponent';
+import Link from 'next/link';
 
 function ScenarioPage() {
     const [scenario, setScenario] = useState([]);
@@ -21,7 +22,7 @@ function ScenarioPage() {
     }, []);
 
     return (
-        <div className="w-full h-[calc(100vh-80px)] bg-gray-300 text-black p-4">
+        <div className="relative w-full h-[calc(100vh-80px)] bg-gray-300 text-black p-4">
             {error ? (
                 <p className="text-red-500">{error}</p>
             ) : (
@@ -43,20 +44,24 @@ function ScenarioPage() {
                                 <td className="border border-gray-400 px-4 py-2">{item.description}</td>
                                 <td className="border border-gray-400 px-4 py-2">{item.patient}</td>
                                 <td className="border border-gray-400 px-4 py-2 flex justify-center items-center">
-                                    <button 
+                                    <Link 
                                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                    onClick={() => {
-                                       // TODO: Implement edit functionality
-                                    }}
-                                    >   
+                                    href={`/scenario/edit/${item.scenario_id}`}
+                                >
                                         Edit
-                                    </button>
+                                    </Link>
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             )}
+            <Link 
+            className="bg-red-500 p-4 rounded-full absolute right-10 bottom-10 transition shadow-lg shadow-red-500/50 hover:bg-red-700 hover:shadow-xl hover:shadow-red-700/50 text-white"
+            href="/scenario/new"
+            >
+                Add Scenario
+            </Link>
         </div>
     );
 }

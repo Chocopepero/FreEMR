@@ -120,7 +120,6 @@ const FormComponent = ({
           placeholder="Weight"
           required
         />
-        <button className={styles.submitbutton} type="submit">Submit</button>
       </form>
     </div>
   );
