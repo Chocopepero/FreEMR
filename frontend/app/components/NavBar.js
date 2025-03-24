@@ -75,15 +75,16 @@ const NavBar = () => {
             <div className="text-xl text-left py-4 pl-4 w-1/3">
                 FreEMR
             </div>
-            <div className='w-1/3' />
-            <div className='w-1/3 flex justify-end items-center py-4 pr-4'>
+            <div className='w-2/3 flex justify-end py-4 pr-4'>
                 {user && user.username ? (
-                    <div>
-                        <span>Welcome, {user.username}</span> 
-                        <br />
-                        <button onClick={handleLogout}>
-                            Logout
-                        </button>
+                    <div className='flex items-center space-x-4'>
+                        <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/"}>Home</Link>
+                        <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/scenario"}>Scenarios</Link>
+                        <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/patients"}>Patients</Link>
+                        <div className="flex flex-col">
+                            <span>Welcome, {user.username}</span>
+                            <button onClick={handleLogout}>Logout</button>
+                        </div>
                     </div>
                 ) : (
                     <Link href="/login">
