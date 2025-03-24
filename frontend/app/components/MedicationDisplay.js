@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 
 const MedicationInput = ({ rows = [], addRow, removeRow }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalError, setModalError] = useState("");
     const [newRow, setNewRow] = useState({
         ndc: "",
         start: "",
@@ -15,16 +16,22 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
         initial: "",
         site: ""
     });
-
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        if (name !== "start" && name !== "stop" || value === "" || (Number(value) >= 0 && Number(value) <= 2359)) {
+        if (name === "ndc") {
+          const numericValue = value.replace(/[^0-9]/g, "");
+          setNewRow((prev) => ({ ...prev, [name]: numericValue }));
+        } else if (name !== "start" && name !== "stop") {
+          setNewRow((prev) => ({ ...prev, [name]: value }));
+        } else {
+          if (value === "" || (Number(value) >= 0 && Number(value) <= 2359)) {
             setNewRow((prev) => ({ ...prev, [name]: value }));
+          }
         }
-    };
-
-    const handleAddRow = () => {
-        addRow(newRow);
+      };
+    
+    const resetNewRow = () => {
         setNewRow({
             ndc: "",
             start: "",
@@ -34,7 +41,24 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
             initial: "",
             site: ""
         });
+        setModalError("")
         setIsModalOpen(false);
+    }
+
+    const handleOpenModal = () => {
+        resetNewRow();
+        setIsModalOpen(true);
+    };
+
+
+    const handleAddRow = () => {
+        setModalError("");
+        if(!newRow.ndc || !newRow.start || !newRow.stop || !newRow.medication){
+            setModalError("All fields are required.")
+        } else {
+            addRow(newRow);
+            resetNewRow();
+        }
     };
 
     useEffect(() => {
@@ -70,7 +94,7 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
             </table>
             <button
                 className="rounded bg-pink-500"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => handleOpenModal()}
             > Add Button</button>
 
             {/* Modal */}
@@ -83,10 +107,12 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                             <input
                                 type="text"
                                 name="ndc"
+                                step="1"
                                 value={newRow.ndc}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded text-black"
                                 placeholder="Medication ID"
+                                inputMode="numeric"
                             />
                         </div>
                         <div className="mb-4">
@@ -124,10 +150,13 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                                 placeholder="Medication Name"
                             />
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify justify-end">
+                            <div className='flex w-full justify-center text-red-500'>
+                                {modalError}
+                            </div>
                             <button
                                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
-                                onClick={() => setIsModalOpen(false)}
+                                onClick={() => resetNewRow()}
                             >
                                 Cancel
                             </button>

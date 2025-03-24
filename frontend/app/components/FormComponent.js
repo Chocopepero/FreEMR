@@ -104,20 +104,24 @@ const FormComponent = ({
           placeholder="Room Number"
           required
         />
-        <FormField
-          type="text"
+        <input
+          className= {styles.textinput}
+          type="number"
           name="height"
           value={formData.height}
           onChange={handleChange}
           placeholder="Height"
+          step="0.1"
           required
         />
-        <FormField
-          type="text"
+        <input
+          className= {styles.textinput}
+          type="number"
           name="weight"
           value={formData.weight}
           onChange={handleChange}
           placeholder="Weight"
+          step="0.1"
           required
         />
       </form>
