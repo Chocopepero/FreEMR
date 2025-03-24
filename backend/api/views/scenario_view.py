@@ -95,8 +95,7 @@ def validate_scenario_data(data):
         medication_ids = validate_medications_data(medications_data)
         if isinstance(medication_ids, Response):
             return medication_ids
-
-
+    
 @api_view(['POST'])
 @login_required
 def submit_scenario(request):
@@ -124,33 +123,39 @@ def submit_scenario(request):
 
     # Prepare scenario data
     scenario_data = {
-        "owner": request.user,
+        "owner": request.user.id,
         "name": data.get("name"),
         "description": data.get("description"),
-        "patient": patient,
+        "patient": patient.pk,
     }
+    if scenario_id:
+        scenario_data["scenario_id"] = scenario_id
 
     try:
         with transaction.atomic():
             if scenario_id:
-                # Update existing scenario
-                scenario = Scenario.objects.filter(scenario_id=scenario_id, owner=request.user).first()
-                if not scenario:
-                    return Response({'error': 'Scenario not found or does not belong to the user'}, status=404)
+                scenario_data.pop('owner', None)
 
-                # Update the scenario fields
-                for key, value in scenario_data.items():
-                    setattr(scenario, key, value)
-                scenario.save()
-
-                # Clear existing medications and re-link them
-                Scenario_Medication.objects.filter(scenario=scenario).delete()
+                # Scenario Update
+                try:
+                    scenario_obj = Scenario.objects.get(scenario_id=scenario_id, owner=request.user)
+                    print(scenario_obj)
+                except Scenario.DoesNotExist:
+                    return Response({'error': 'Scenario not found or does not belong to the user'}, 401)
+                serializer = ScenarioSerializer(scenario_obj, data = scenario_data, partial=True)
+                if serializer.is_valid():
+                    # Clear existing medications and re-link them
+                    Scenario_Medication.objects.filter(scenario=scenario_obj).delete()
+                    serializer.save()
+                else:
+                    return Response(serializer.errors, status=400)
+                
             else:
                 # Create a new scenario
                 scenario_data["scenario_id"] = generate_unique_scenario_id()
                 scenario_serializer = ScenarioSerializer(data=scenario_data)
                 if scenario_serializer.is_valid():
-                    scenario = scenario_serializer.save()
+                    scenario_obj = scenario_serializer.save()
                 else:
                     return Response(scenario_serializer.errors, status=400)
 
@@ -158,7 +163,7 @@ def submit_scenario(request):
             for med_id in medication_ids:
                 medication = Medication.objects.get(id=med_id)
                 Scenario_Medication.objects.create(
-                    scenario=scenario,
+                    scenario=scenario_obj,
                     medication=medication,
                     owner=request.user
                 )
@@ -177,12 +182,14 @@ def get_user_scenarios(request):
     # Fetch scenarios owned by the user or the global user
     scenarios = Scenario.objects.filter(
         Q(owner=user) | Q(owner__username='global')
-    ).values(
-        'scenario_id', 'name', 'description', 'patient', 'medication'
-    )
+    ).values()
+    for scenario in scenarios:
+        patient_obj = Patient.objects.get(pk=scenario["patient_id"])
+        scenario["patient_name"] = patient_obj.name
+
 
     return JsonResponse({
-        'scenarios': list(scenarios),
+        'scenarios': list(scenarios)
     })
 
 
@@ -208,3 +215,16 @@ def get_single_scenario(request, scenario_id):
     ]
     scenario_data['medication'] = medications
     return JsonResponse(scenario_data)
+
+@login_required
+def delete_scenario(request, scenario_id):
+    try:
+        scenario = get_object_or_404(Scenario, scenario_id=scenario_id)
+        if request.user != scenario.owner:
+            return JsonResponse({'error': 'Scenario does not belong to this user.'}, status=401)
+        scenario_medications = Scenario_Medication.objects.filter(scenario=scenario)
+        scenario_medications.delete()
+        scenario.delete()
+    except Scenario.DoesNotExist:
+        return Response({'error': f'Scenario with id {scenario_id} does not exist'}, status=400)
+    return Response({'message': 'Scenario deleted successfully'}, status=200)

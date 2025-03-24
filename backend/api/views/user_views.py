@@ -5,28 +5,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from ..serializers import PatientSerializer
-from ..models import Patient
-
-
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
-@api_view(['POST'])
-def submit_patient(request):
-    print(request.data)
-    serializer = PatientSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({'message': 'Form submitted successfully'}, status=200)
-    return Response(serializer.errors, status=400)
-
-@api_view(['GET'])
-def get_patient(request, patient_id):
-    print(request)
-    patient = get_object_or_404(Patient, patient_id=patient_id)
-    serializer = PatientSerializer(patient)
-    return Response(serializer.data, status=200)
-
 
 @api_view(['POST'])
 def login_page(request):
@@ -68,4 +50,6 @@ def logout_view(request):
     auth_request = getattr(request, '_request', request)
     logout(auth_request)
     return JsonResponse({'success': True, 'message': 'Logged out successfully'})
+
+
 
