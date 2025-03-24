@@ -3,6 +3,15 @@ from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
+def get_global_user():
+    try:
+        # Try to get the global user; adjust the username as needed.
+        global_user = User.objects.get(username='global')
+    except ObjectDoesNotExist:
+        # If the global user doesn't exist, create it. You might want to do this in a data migration instead.
+        global_user = User.objects.create_user(username='global', password='somepassword')
+    return global_user.pk
+
 # Create your models here.
 class Patient(models.Model):
     patient_id = models.CharField(max_length=100, primary_key=True)
@@ -12,6 +21,7 @@ class Patient(models.Model):
     room_num = models.CharField(max_length=100)
     height = models.FloatField()
     weight = models.FloatField()
+    owner = models.ForeignKey(User, related_name='patient', on_delete=models.CASCADE, default=get_global_user)
 
     def __str__(self):
         return f"{self.name} ({self.patient_id})"
@@ -28,20 +38,11 @@ class Medication(models.Model):
     def __str__(self):
         return f"({self.medication})"
     
-def get_global_user():
-    try:
-        # Try to get the global user; adjust the username as needed.
-        global_user = User.objects.get(username='global')
-    except ObjectDoesNotExist:
-        # If the global user doesn't exist, create it. You might want to do this in a data migration instead.
-        global_user = User.objects.create_user(username='global', password='somepassword')
-    return global_user.pk
-    
 class Scenario(models.Model):
     scenario_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=1000)
-    owner = models.ForeignKey(User, related_name='scenarios', on_delete=models.CASCADE, default=get_global_user)
+    owner = models.ForeignKey(User, related_name='scenario', on_delete=models.CASCADE, default=get_global_user)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     medication = models.ManyToManyField(Medication, through='Scenario_Medication')
 
