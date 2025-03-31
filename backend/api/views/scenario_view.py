@@ -216,15 +216,23 @@ def get_single_scenario(request, scenario_id):
     scenario_data['medication'] = medications
     return JsonResponse(scenario_data)
 
+@api_view(['POST', 'DELETE'])
 @login_required
 def delete_scenario(request, scenario_id):
     try:
-        scenario = get_object_or_404(Scenario, scenario_id=scenario_id)
-        if request.user != scenario.owner:
-            return JsonResponse({'error': 'Scenario does not belong to this user.'}, status=401)
-        scenario_medications = Scenario_Medication.objects.filter(scenario=scenario)
-        scenario_medications.delete()
-        scenario.delete()
+        scenario = Scenario.objects.get(scenario_id=scenario_id)
     except Scenario.DoesNotExist:
         return Response({'error': f'Scenario with id {scenario_id} does not exist'}, status=400)
-    return Response({'message': 'Scenario deleted successfully'}, status=200)
+    if request.user != scenario.owner:
+        return JsonResponse({'error': 'Scenario does not belong to this user.'}, status=401)
+    scenario_medications = Scenario_Medication.objects.filter(scenario=scenario)
+    scenario_medications.delete()
+    scenario.delete()
+
+    remaining_scenarios = Scenario.objects.filter(owner=request.user)
+    serializer = ScenarioSerializer(remaining_scenarios, many=True)
+
+    return Response({
+        'message': 'Scenario deleted successfully',
+        'scenarios': serializer.data
+    }, status=200)

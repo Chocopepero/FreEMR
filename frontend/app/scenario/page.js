@@ -7,6 +7,21 @@ function ScenarioPage() {
     const [scenario, setScenario] = useState([]);
     const [error, setError] = useState(null);
 
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/scenario-data/`, {
             credentials: 'include',
@@ -22,8 +37,13 @@ function ScenarioPage() {
     }, []);
 
     const handleDeleteClick = (scenario_id) => {
-        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/delete-scenario/${scenario_id}`, {
+        const csrfToken = getCookie('csrftoken');
+        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/delete-scenario/${scenario_id}/`, {
+            method: 'DELETE',
             credentials: 'include',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
         })
             .then(response => {
                 if (!response.ok) {
@@ -32,7 +52,10 @@ function ScenarioPage() {
                 return response.json();
             })
             .then(data => setScenario(data.scenarios || []))
-            .catch(err => setError(err.message));
+            .catch(err => {
+                console.error('Delete error:', err);
+                setError(err.message);
+            });
     }
 
 
@@ -66,6 +89,7 @@ function ScenarioPage() {
                                         Edit
                                     </Link>
                                     <button
+                                        type='button'
                                         className="bg-red-500 hover:bg-red-700 text-white font-bold ml-4 py-2 px-4 rounded transition"
                                         onClick={() => handleDeleteClick(item.scenario_id)}
                                     >Delete</button>
