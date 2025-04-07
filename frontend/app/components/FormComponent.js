@@ -1,4 +1,3 @@
-'use client'
 import styles from './styles.module.css'
 import { useState } from 'react';
 
@@ -14,27 +13,29 @@ const FormField = ({ type, name, value, onChange, placeholder, required }) => (
   />
 );
 
-const FormComponent = ({
-  formData = {
+
+const FormComponent = () => {
+  const [formData, setFormData] = useState({
     name: '',
     dob: '',
     sex: '',
     patient_id: '',
     room_num: '',
     height: '',
-    weight: '',
-  },
-  onFormChange = () => {}
-}) => {
+    weight: ''
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    onFormChange(name, value);
+    setFormData({...formData,
+      [name]: value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-patient/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-form/`, {
         method: 'POST',
         mode: 'cors',
         credentials: 'include',
@@ -104,26 +105,23 @@ const FormComponent = ({
           placeholder="Room Number"
           required
         />
-        <input
-          className= {styles.textinput}
-          type="number"
+        <FormField
+          type="text"
           name="height"
           value={formData.height}
           onChange={handleChange}
           placeholder="Height"
-          step="0.1"
           required
         />
-        <input
-          className= {styles.textinput}
-          type="number"
+        <FormField
+          type="text"
           name="weight"
           value={formData.weight}
           onChange={handleChange}
-          placeholder="Weight"
-          step="0.1"
+          placeholder= "Weight"
           required
         />
+        <button className={styles.submitbutton} type="submit">Submit</button>
       </form>
     </div>
   );

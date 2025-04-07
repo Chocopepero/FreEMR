@@ -58,6 +58,18 @@ function ScenarioPage() {
             });
     }
 
+    const copyLinkToClipboard = (scenario_id) =>{
+        const link = `${window.location.origin}/student_view/show_scenario/${scenario_id}`;
+        navigator.clipboard.writeText(link)
+            .then(() => {
+                alert('Link copied to clipboard!');
+            })
+            .catch(err => {
+                console.error('Failed to copy link:', err);
+                alert('Failed to copy link');
+            });
+    }
+
 
     return (
         <div className="relative w-full min-h-[calc(100vh-80px)] bg-gray-300 text-black p-4">
@@ -81,18 +93,27 @@ function ScenarioPage() {
                                 <td className="border border-gray-400 px-4 py-2">{item.name}</td>
                                 <td className="border border-gray-400 px-4 py-2">{item.description}</td>
                                 <td className="border border-gray-400 px-4 py-2">{item.patient_name}</td>
-                                <td className="border border-gray-400 px-4 py-2 flex justify-center">
-                                    <Link
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-                                        href={`/scenario/edit/${item.scenario_id}`}
-                                    >
-                                        Edit
-                                    </Link>
-                                    <button
-                                        type='button'
-                                        className="bg-red-500 hover:bg-red-700 text-white font-bold ml-4 py-2 px-4 rounded transition"
-                                        onClick={() => handleDeleteClick(item.scenario_id)}
-                                    >Delete</button>
+                                <td className="border border-gray-400 px-4 py-2">
+                                    <div className="flex flex-wrap gap-2 justify-center">
+                                        <button
+                                                type='button'
+                                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition"
+                                                onClick={() => copyLinkToClipboard(item.scenario_id)}
+                                            >Link</button>
+
+                                        <Link
+                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+                                            href={`/scenario/edit/${item.scenario_id}`}
+                                        >
+                                            Edit
+                                        </Link>
+
+                                        <button
+                                            type='button'
+                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
+                                            onClick={() => handleDeleteClick(item.scenario_id)}
+                                        >Delete</button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -108,5 +129,7 @@ function ScenarioPage() {
         </div>
     );
 }
+
+
 
 export default withAuth(ScenarioPage);
