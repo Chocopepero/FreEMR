@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.user_views import login_page, current_user, logout_view
 from .views.scenario_view import  submit_scenario, get_user_scenarios, get_single_scenario, delete_scenario
-from .views.patient_views import submit_patient, get_patient, get_user_patients, update_patient
+from .views.patient_views import submit_patient, get_patient, get_user_patients, update_patient, delete_patient
 
 urlpatterns = [
     path('api/submit-patient/', submit_patient),
@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/scenario-data/', get_user_scenarios),
     path('api/single-scenario/<uuid:scenario_id>/', get_single_scenario),
     path('api/delete-scenario/<uuid:scenario_id>/', delete_scenario),
-    path('api/update-patient', update_patient)
+    path('api/update-patient/', update_patient),
+    path('api/delete-patient/<str:patient_id>/', delete_patient)
 ]

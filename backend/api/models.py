@@ -21,7 +21,7 @@ class Patient(models.Model):
     room_num = models.CharField(max_length=100)
     height = models.FloatField()
     weight = models.FloatField()
-    owner = models.ForeignKey(User, related_name='patient', on_delete=models.CASCADE, default=get_global_user)
+    owner = models.ForeignKey(User, related_name='patient', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name} ({self.patient_id})"
