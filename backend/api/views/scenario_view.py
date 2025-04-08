@@ -11,6 +11,31 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 import uuid
 
+@api_view(['GET'])
+def get_scenario_without_auth(request, scenario_id):
+
+    try:
+        scenario = get_object_or_404(Scenario, scenario_id=scenario_id)
+        serializer = ScenarioSerializer(scenario)
+        data = serializer.data
+        
+        # Add medication data
+        medication_data = []
+        for med in scenario.medication.all():
+            medication_data.append({
+                'medication': med.medication,
+                'start': med.start,
+                'stop': med.stop,
+                'time': med.time,
+                'initial': med.initial,
+                'site': med.site
+            })
+        
+        data['medication'] = medication_data
+        
+        return Response(data, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=404)
 # Helper function to generate a unique scenario ID
 def generate_unique_scenario_id():
     while True:

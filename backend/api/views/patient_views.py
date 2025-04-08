@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from ..serializers import PatientSerializer
-from ..models import Patient
+from ..serializers import PatientSerializer, ScenarioSerializer
+from ..models import Patient, Scenario
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
@@ -23,11 +23,14 @@ def submit_patient(request):
     return Response(serializer.errors, status=400)
 
 @api_view(['GET'])
-def get_patient(request, patient_id):
-    print(request)
-    patient = get_object_or_404(Patient, patient_id=patient_id)
-    serializer = PatientSerializer(patient)
-    return Response(serializer.data, status=200)
+def get_patient_without_auth(request, patient_id):
+
+    try:
+        patient = get_object_or_404(Patient, patient_id=patient_id)
+        serializer = PatientSerializer(patient)
+        return Response(serializer.data, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=404)
 
 @login_required
 def get_user_patients(request):
@@ -47,14 +50,15 @@ def get_user_patients(request):
 def update_patient(request):
     patient_data = request.data.get('patient')
     try:
-        patient_obj = Patient.objects.get(pk = patient_data.patient_id)
+        patient_obj = Patient.objects.get(pk=patient_data['patient_id'])
     except Patient.DoesNotExist:
-        return Response({'error': 'Patient not found'}, 400)
+        return Response({'error': 'Patient not found'}, status=400)
+    
     patient_serializer = PatientSerializer(patient_obj, data=patient_data, partial=True)
     if patient_serializer.is_valid():
         patient_serializer.save()
     else:
-        return Response({'error':'Patient data invalid'}, status=400)
+        return Response({'error':'Patient data invalid', 'details': patient_serializer.errors}, status=400)
     return Response({'message': 'Patient updated successfully'}, status=200)
 
 @api_view(['POST', 'DELETE'])
