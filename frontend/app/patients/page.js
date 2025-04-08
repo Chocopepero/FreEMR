@@ -6,15 +6,15 @@ import FormComponent from '../components/FormComponent';
 
 const defaultFormData = {
     patient: {
-      patient_id: "",
-      name: "",
-      dob: "",
-      sex: "",
-      room_num: "",
-      height: "",
-      weight: ""
+        patient_id: "",
+        name: "",
+        dob: "",
+        sex: "",
+        room_num: "",
+        height: "",
+        weight: ""
     }
-  };
+};
 
 function PatientPage() {
     const [user, setUser] = useState(null);
@@ -169,18 +169,8 @@ function PatientPage() {
     };
 
     const handleClickCancel = () => {
-        console.log("Handle Cancel Clicked.")
-        setFormData({
-            patient: {
-                patient_id: "",
-                name: "",
-                dob: "",
-                sex: "",
-                room_num: "",
-                height: "",
-                weight: ""
-            }
-        });
+        setModalError(null);
+        setFormData(defaultFormData);
         setIsModalOpen(false);
     }
 
@@ -231,42 +221,47 @@ function PatientPage() {
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                     <div className="flex w-full max-w-4xl">
                         <div className="bg-white p-6 rounded shadow-md flex-grow">
-                            <FormComponent formData={{
-                                patient_id: formData.patient.patient_id || "",
-                                name: formData.patient.name || "",
-                                dob: formData.patient.dob || "",
-                                sex: formData.patient.sex || "",
-                                room_num: formData.patient.room_num || "",
-                                height: formData.patient.height || "",
-                                weight: formData.patient.weight || "",
-                            }}
-                                onFormChange={handleFormChange}
-                            />
-                            <div className='flex justify'>
-                                <div className='w-full'>
-                                    {modalError && <div className='w-full justify-items-start'>
+                            <form onSubmit={handleSubmitClick}>
+                                <FormComponent
+                                    formData={{
+                                        patient_id: formData.patient.patient_id || "",
+                                        name: formData.patient.name || "",
+                                        dob: formData.patient.dob || "",
+                                        sex: formData.patient.sex || "",
+                                        room_num: formData.patient.room_num || "",
+                                        height: formData.patient.height || "",
+                                        weight: formData.patient.weight || "",
+                                    }}
+                                    onFormChange={handleFormChange}
+                                    wrapInForm={false}
+                                    hideSubmitButton={true}
+                                    onSubmit={handleSubmitClick}
+                                />
+                                {modalError && (
+                                    <div className="w-full justify-items-start text-red-500">
                                         {modalError}
-                                    </div>}
-                                </div>
-                                <div className='justify-end'>
+                                    </div>
+                                )}
+                                <div className="flex justify-end space-x-2">
                                     <button
-                                        className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2'
-                                        onClick={(e) => handleSubmitClick(e)}
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                     >
                                         Submit
                                     </button>
-                                </div>
-                                <div className='justify-end'>
                                     <button
+                                        type="button"
                                         className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                                        onClick={() => handleClickCancel()}>
+                                        onClick={handleClickCancel}
+                                    >
                                         Cancel
                                     </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
-                </div>)}
+                </div>
+            )}
         </div>
     );
 }
