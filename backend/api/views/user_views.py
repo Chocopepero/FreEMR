@@ -41,6 +41,7 @@ def current_user(request):
         return JsonResponse({
             'username': request.user.username,
             'email': request.user.email,
+            'user_id': request.user.id,
         })
     else:
         return JsonResponse({'error': 'Not authenticated'}, status=401)

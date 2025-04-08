@@ -72,9 +72,12 @@ const NavBar = () => {
 
     return (
         <div className='topbar flex justify-between items-center bg-blue-500 sticky top-0 z-50'>
-            <div className="text-xl text-left py-4 pl-4 w-1/3">
-                <Link href={"/"} >FreEMR</Link>
-            </div>
+            <Link 
+            className="text-xl text-left py-4 pl-4 w-1/3"
+            href={"/"}
+            >
+                FreEMR
+            </Link>
             <div className='w-2/3 flex justify-end py-4 pr-4'>
                 {user && user.username ? (
                     <div className='flex items-center space-x-4'>

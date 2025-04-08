@@ -26,6 +26,8 @@ export default function ScenarioCreation({ scenarioId = null }) {
     notes: []
   });
   const [loading, setLoading] = useState(true);
+  const [patients, setPatients] = useState([]);
+
 
 
   const useExistingData = async () => {
@@ -64,7 +66,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
               }
             }));
           }
-          catch(error){
+          catch (error) {
             console.error('Error fetching patient data:', error);
           }
         }
@@ -86,6 +88,25 @@ export default function ScenarioCreation({ scenarioId = null }) {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    async function fetchPatients() {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get_user_patients/`, {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch patients.");
+        }
+        const data = await response.json();
+        setPatients(data.patients || []); // assuming your API returns { patients: [...] }
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    }
+    fetchPatients();
+  }, []);
+  
 
   useEffect(() => {
     if (scenarioId) {
@@ -179,23 +200,54 @@ export default function ScenarioCreation({ scenarioId = null }) {
     }
   };
 
+  const handlePatientSelect = (selectedId) => {
+    const selectedPatient = patients.find((p) => p.patient_id === selectedId);
+    if (selectedPatient) {
+      setFormData((prev) => ({
+        ...prev,
+        patient: {
+          ...selectedPatient, // Copy all patient fields from the selected patient
+        },
+      }));
+    } else {
+      // Optionally clear the patient field if no selection was made
+      setFormData((prev) => ({
+        ...prev,
+        patient: {
+          patient_id: "",
+          name: "",
+          dob: "",
+          sex: "",
+          room_num: "",
+          height: "",
+          weight: "",
+        },
+      }));
+    }
+  };
+
+
   function getContentForButton(selectedButton) {
     if (selectedButton === 'Patient Info') {
       return (
-        <div className="flex">
-          <div className="bg-blue-500">
-            <FormComponent
-              formData={{
-                patient_id: formData.patient.patient_id || "",
-                name: formData.patient.name || "",
-                dob: formData.patient.dob || "",
-                sex: formData.patient.sex || "",
-                room_num: formData.patient.room_num || "",
-                height: formData.patient.height || "",
-                weight: formData.patient.weight || "",
-              }}
-              onFormChange={handleFormChange}
-            />
+        <div className="flex flex-col">
+          <div className="mb-4">
+            <label htmlFor="patientSelect" className="block text-gray-700">
+              Select Patient:
+            </label>
+            <select
+              id="patientSelect"
+              value={formData.patient.patient_id}
+              onChange={(e) => handlePatientSelect(e.target.value)}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded text-black"
+            >
+              <option value="">-- Select a Patient --</option>
+              {patients.map((p) => (
+                <option key={p.patient_id} value={p.patient_id}>
+                  {p.name} ({p.patient_id})
+                </option>
+              ))}
+            </select>
 
           </div>
           <MedicationInput

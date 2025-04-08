@@ -8,12 +8,18 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
+@login_required
 def submit_patient(request):
     print(request.data)
     serializer = PatientSerializer(data=request.data)
+    new_list = Patient.objects.filter(Q(owner=request.user) | Q(owner__username='global'))
+    new_list_serializer = PatientSerializer(new_list, many=True)
     if serializer.is_valid():
         serializer.save()
-        return Response({'message': 'Form submitted successfully'}, status=200)
+        return Response({
+            'message': 'Form submitted successfully', 
+            'patients': new_list_serializer.data                 
+        }, status=200)
     return Response(serializer.errors, status=400)
 
 @api_view(['GET'])
@@ -28,11 +34,12 @@ def get_patient_without_auth(request, patient_id):
 
 @login_required
 def get_user_patients(request):
-    user = request.user.id
-
     patients = Patient.objects.filter(
-        Q(owner=user) | Q(owner__username='global')
+        Q(owner=request.user) | Q(owner__username='global')
     ).values()
+
+    for patient in patients:
+        patient['owner'] = patient.pop('owner_id')
 
     return JsonResponse({
         'patients': list(patients)
@@ -54,3 +61,21 @@ def update_patient(request):
         return Response({'error':'Patient data invalid', 'details': patient_serializer.errors}, status=400)
     return Response({'message': 'Patient updated successfully'}, status=200)
 
+@api_view(['POST', 'DELETE'])
+@login_required
+def delete_patient(request, patient_id):    
+    try:
+        patient = Patient.objects.get(patient_id=patient_id)
+    except Patient.DoesNotExist:
+        return Response({'error': f'Patient with id {patient_id} does not exist'}, status=400)
+    if request.user != patient.owner:
+        return JsonResponse({'error': 'Patient does not belong to this user.'}, status=401)
+    patient.delete()
+
+    remaining_patients = Patient.objects.filter(Q(owner=request.user) | Q(owner__username='global'))
+    serializer = PatientSerializer(remaining_patients, many=True)
+
+    return Response({
+        'message': 'Patient deleted successfully',
+        'patients': serializer.data
+    }, status=200)
