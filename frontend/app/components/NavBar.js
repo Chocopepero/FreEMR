@@ -73,7 +73,7 @@ const NavBar = () => {
     return (
         <div className='topbar flex justify-between items-center bg-blue-500 sticky top-0 z-50'>
             <div className="text-xl text-left py-4 pl-4 w-1/3">
-                FreEMR
+                <Link href={"/"} >FreEMR</Link>
             </div>
             <div className='w-2/3 flex justify-end py-4 pr-4'>
                 {user && user.username ? (
@@ -81,6 +81,7 @@ const NavBar = () => {
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/"}>Home</Link>
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/scenario"}>Scenarios</Link>
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/patients"}>Patients</Link>
+                        <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"https://forms.gle/Po3wYK7yyeHcMQvMA"}>Feedback</Link>
                         <div className="flex flex-col">
                             <span>Welcome, {user.username}</span>
                             <button onClick={handleLogout}>Logout</button>
