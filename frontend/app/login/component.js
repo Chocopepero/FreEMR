@@ -69,7 +69,7 @@ export default function LoginPage() {
             console.log('Login success:', data);
             // Clear the password from state after submission
             setPassword('');
-            router.push('/');
+            window.location.href = '/';
         } catch (error) {
             console.error('Login error:', error);
             setErrorMessage('An unexpected error occurred. Please try again.');
