@@ -30,6 +30,8 @@ export default function ShowScenario() {
     const params = useParams();
     const scenID = params.scenID;
 
+
+
     useEffect(() => {
         // Try to get stored student name from localStorage
         const savedName = localStorage.getItem('studentName');
@@ -84,6 +86,15 @@ export default function ShowScenario() {
             fetchScenarioData();
         }
     }, [scenID]);
+
+    // This component creates a mailto link
+    const Mailto = ({ email, subject = '', body = '', children }) => {
+        let params = subject || body ? '?' : '';
+        if (subject) params += `subject=${encodeURIComponent(subject)}`;
+        if (body) params += `${subject ? '&' : ''}body=${encodeURIComponent(body)}`;
+        
+        return <a href={`mailto:${email}${params}`} target="_blank">{children}</a>;
+        };
 
     const handleStudentNameChange = (e) => {
         const name = e.target.value;
@@ -296,6 +307,8 @@ export default function ShowScenario() {
                     </svg>
                     Download Notes
                 </button>
+
+                
                 
                 <button 
                     onClick={() => window.location.reload()}
@@ -304,6 +317,12 @@ export default function ShowScenario() {
                     Revert Changes
                 </button>
             </div>
+
+            <Mailto email="" subject={studentName + " " + "submission for scenario " + scenario.name}body="">
+                <button className="mt-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition">
+                    Send As Email
+                </button>
+            </Mailto>
         </div>
     );
 }
