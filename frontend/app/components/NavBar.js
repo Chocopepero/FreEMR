@@ -71,7 +71,7 @@ const NavBar = () => {
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div className='topbar flex justify-between items-center bg-blue-500 sticky top-0 z-50'>
+        <div className='topbar flex justify-between items-center bg-gradient-to-r from-nav-left via-nav-center to-nav-right sticky top-0 z-50 rounded'>
             <Link 
             className="text-xl text-left py-4 pl-4 w-1/3"
             href={"/"}
