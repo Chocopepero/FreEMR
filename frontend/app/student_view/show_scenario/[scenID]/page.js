@@ -145,17 +145,7 @@ export default function ShowScenario() {
         }));
     };
 
-    // Handle download
-    const handleDownload = () => {
-        // First validate that the student has provided their name
-        if (!studentName.trim()) {
-            setNameError(true);
-            // Scroll to the top to show the error
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            return; // Stop execution if no name is provided
-        }
-        setNameError(false); // Clear any previous error
-        
+    const MakeContent = () => {
         // Create content for patient data
         let content = "STUDENT: " + studentName + "\n\n";
         content += "SCENARIO INFORMATION\n";
@@ -180,6 +170,24 @@ export default function ShowScenario() {
                 content += `  ${key}: ${value || 'N/A'}${isEdited}\n`;
             });
         });
+
+        return content;
+    };
+
+    // Handle download
+    const handleDownload = () => {
+        // First validate that the student has provided their name
+        if (!studentName.trim()) {
+            setNameError(true);
+            // Scroll to the top to show the error
+            if (typeof window !== 'undefined') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            return; // Stop execution if no name is provided
+        }
+        
+        setNameError(false); // Clear any previous error
+        const content = MakeContent();
         
         // Generate filename with student name and scenario name
         const cleanStudentName = studentName.trim().replace(/[^\w\s]/gi, '');
@@ -189,15 +197,17 @@ export default function ShowScenario() {
             : `scenario_${scenID}_notes.txt`;
         
         // Create and trigger download
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        if (typeof window !== 'undefined') {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
     };
 
     if (isLoading) {
@@ -318,7 +328,7 @@ export default function ShowScenario() {
                 </button>
             </div>
 
-            <Mailto email="" subject={studentName + " " + "submission for scenario " + scenario.name}body="">
+            <Mailto email="" subject={studentName + " " + "submission for scenario " + scenario.name}body={MakeContent()}>
                 <button className="mt-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition">
                     Send As Email
                 </button>
