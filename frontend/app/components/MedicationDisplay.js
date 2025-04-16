@@ -267,8 +267,8 @@ const MedicationOutput = ({ initialData }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {rows.map((row) => (
-                        <tr key={row.id}>
+                    {rows.map((row, index) => (
+                        <tr key={row.id || `row-${index}`}>
                             <td className="border p-1">{row.start}</td>
                             <td className="border p-1">{row.stop}</td>
                             <td className="border p-1 flex justify-between items-center">{row.medication}
