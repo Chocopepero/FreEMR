@@ -45,8 +45,9 @@ class Scenario(models.Model):
     owner = models.ForeignKey(User, related_name='scenario', on_delete=models.CASCADE, default=get_global_user)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     medication = models.ManyToManyField(Medication, through='Scenario_Medication')
-    diagnosis = models.CharField(max_length=1000, blank=True, null=True)
-    allergies = models.CharField(max_length=1000)
+    notes = models.JSONField(blank=True, null=True)
+    diagnosis = models.CharField(max_length=1000)
+    allergies = models.CharField(max_length=1000, default="NKA")
     medical_doctor = models.CharField(max_length=1000)
 
     def __str__(self):

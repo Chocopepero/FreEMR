@@ -152,6 +152,10 @@ def submit_scenario(request):
         "name": data.get("name"),
         "description": data.get("description"),
         "patient": patient.pk,
+        "notes": data.get("notes"),
+        "diagnosis": data.get("diagnosis"),
+        "allergies": data.get("allergies"),
+        "medical_doctor": data.get("medical_doctor"),
     }
     if scenario_id:
         scenario_data["scenario_id"] = scenario_id

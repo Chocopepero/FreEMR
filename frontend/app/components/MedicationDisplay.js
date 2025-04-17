@@ -77,8 +77,8 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {rows.map((row) => (
-                        <tr key={row.id}>
+                {rows.map((row, index) => (
+                        <tr key={row.id || `row-${index}`}>
                             <td className="border">{row.ndc}</td>
                             <td className="border">{row.start}</td>
                             <td className="border">{row.stop}</td>

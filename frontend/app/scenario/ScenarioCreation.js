@@ -23,7 +23,10 @@ export default function ScenarioCreation({ scenarioId = null }) {
       weight: ""
     },
     medications: [],
-    notes: []
+    notes: [],
+    diagnosis: "",
+    allergies: "",
+    medical_doctor: ""
   });
   const [loading, setLoading] = useState(true);
   const [patients, setPatients] = useState([]);
@@ -78,6 +81,9 @@ export default function ScenarioCreation({ scenarioId = null }) {
           description: data.description || "",
           medications: Array.isArray(data.medication) ? data.medication : [],
           notes: Array.isArray(data.notes) ? data.notes : [],
+          diagnosis: data.diagnosis || "",
+          allergies: data.allergies || "",
+          medical_doctor: data.medical_doctor || ""
         }));
       } catch (error) {
         console.error('Error fetching scenario data:', error);
@@ -106,7 +112,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
     }
     fetchPatients();
   }, []);
-  
+
 
   useEffect(() => {
     if (scenarioId) {
@@ -144,10 +150,10 @@ export default function ScenarioCreation({ scenarioId = null }) {
     }));
   };
 
-  const addNote = (newNote) => {
+  const addNote = (updatedNotes) => {
     setFormData((prev) => ({
       ...prev,
-      notes: [...prev.notes, newNote],
+      notes: updatedNotes,
     }));
   };
 
@@ -179,6 +185,8 @@ export default function ScenarioCreation({ scenarioId = null }) {
 
   const handleSubmit = async () => {
     const csrfToken = getCookie('csrftoken');
+
+    
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
         method: 'POST',
@@ -281,6 +289,33 @@ export default function ScenarioCreation({ scenarioId = null }) {
             value={formData.description || ""
             }
             onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">
+            Diagnosis:
+          </label>
+          <input
+            type="text"
+            value={formData.diagnosis || ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, diagnosis: e.target.value }))}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">
+            Allergies:
+          </label>
+          <input
+            type="text"
+            value={formData.allergies || ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, allergies: e.target.value }))}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+          <label className="block text-gray-700 text-sm font-bold mt-4 mb-2">
+            Medical Doctor:
+          </label>
+          <input
+            type="text"
+            value={formData.medical_doctor || ""}
+            onChange={(e) => setFormData((prev) => ({ ...prev, medical_doctor: e.target.value }))}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           />
         </div>
