@@ -79,23 +79,23 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                 <tbody>
                 {rows.map((row, index) => (
                         <tr key={row.id || `row-${index}`}>
-                            <td className="border">{row.ndc}</td>
-                            <td className="border">{row.start}</td>
-                            <td className="border">{row.stop}</td>
-                            <td className="border flex justify-between items-center">{row.medication}
+                            <td className="border pl-2">{row.ndc}</td>
+                            <td className="border pl-2">{row.start}</td>
+                            <td className="border pl-2">{row.stop}</td>
+                            <td className="border flex justify-between items-center pl-2">{row.medication}
                                 <button
-                                    className="bg-red-500 rounded m-2"
+                                    className="bg-red-500 rounded m-2 px-2 text-white hover:bg-red-600" 
                                     onClick={() => removeRow(row.id)}
-                                >This is a button</button>
+                                >Delete</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
             <button
-                className="rounded bg-pink-500"
+                className="rounded bg-green-500 p-2 m-2 text-white hover:bg-green-600"
                 onClick={() => handleOpenModal()}
-            > Add Button</button>
+            > Add Medication</button>
 
             {/* Modal */}
             {isModalOpen && (

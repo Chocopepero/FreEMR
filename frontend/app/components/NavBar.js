@@ -84,7 +84,7 @@ const NavBar = () => {
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/"}>Home</Link>
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/scenario"}>Scenarios</Link>
                         <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"/patients"}>Patients</Link>
-                        <Link className='flex bg-gray-700 px-2 py-1 rounded-xl' href={"https://forms.gle/Po3wYK7yyeHcMQvMA"}>Feedback</Link>
+                        <Link className='flex bg-purple-500 px-2 py-1 rounded-xl' href={"https://forms.gle/Po3wYK7yyeHcMQvMA"}>Feedback</Link>
                         <div className="flex flex-col">
                             <span>Welcome, {user.username}</span>
                             <button onClick={handleLogout}>Logout</button>
