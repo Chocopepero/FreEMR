@@ -30,6 +30,17 @@ export default function ShowScenario() {
     const params = useParams();
     const scenID = params.scenID;
 
+    // Field Labels for display
+    const fieldLabels = {
+        name: "Name",
+        dob: "Date of Birth",
+        sex: "Sex",
+        room_num: "Room Number",
+        height: "Height (inches)",
+        weight: "Weight (pounds)",
+        allergies: "Allergies",
+        // Add other mappings as needed
+    };
 
 
     useEffect(() => {
@@ -248,7 +259,7 @@ export default function ShowScenario() {
                 )}
             </div>
 
-            //Scenario Information
+            {/* Scenario Information */}
             {scenario && (
                 <div className="bg-blue-50 p-4 rounded-lg shadow mb-6">
                     <h1 className="text-2xl font-bold mb-2">{scenario.name}</h1>
@@ -265,7 +276,7 @@ export default function ShowScenario() {
                         {Object.entries(patient).map(([key, value]) => (
                             key !== 'patient_id' && key !== 'owner' && (
                                 <div key={key} className="bg-white p-4 rounded shadow">
-                                    <p className="font-semibold">{key}</p>
+                                    <p className="font-semibold">{fieldLabels[key] || key}</p>
                                     <input 
                                         type="text" 
                                         value={value || ''}
@@ -282,7 +293,7 @@ export default function ShowScenario() {
                 </div>
             )}
 
-            //Medication section
+            {/* Medication section */}
             <div>
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-bold mb-4 border-b pb-2 bg-blue-500 text-white p-2 rounded-t flex-grow">Medications</h2>
@@ -306,7 +317,7 @@ export default function ShowScenario() {
                 )}
             </div>
 
-            //Download Button and Revert Changes button
+            {/* Download Button and Revert Changes button */}
             <div className="mt-8 flex space-x-4">
                 <button
                     onClick={handleDownload}
