@@ -12,7 +12,7 @@ const withAuth = (WrappedComponent) => {
         useEffect(() => {
             async function checkAuth() {
                 try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/current_user/`, {
+                    const res = await fetch(`/api/current_user/`, {
                         credentials: 'include', // Include cookies for session-based authentication
                     });
 

@@ -25,7 +25,7 @@ function PatientPage() {
     const [formData, setFormData] = useState(defaultFormData)
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get_user_patients/`, {
+        fetch(`/api/get_user_patients/`, {
             credentials: 'include',
         })
             .then(response => {
@@ -40,7 +40,7 @@ function PatientPage() {
         async function fetchUser() {
             try {
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/current_user/`,
+                    `/api/current_user/`,
                     {
                         credentials: 'include',
                     }
@@ -103,7 +103,7 @@ function PatientPage() {
                     owner: user?.user_id,
                 };
 
-                const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-patient/`, {
+                const response = await fetch(`/api/submit-patient/`, {
                     method: 'POST',
                     mode: 'cors',
                     credentials: 'include',
@@ -134,7 +134,7 @@ function PatientPage() {
 
     const handleDeleteClick = (patient_id) => {
         const csrfToken = getCookie('csrftoken');
-        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/delete-patient/${patient_id}/`, {
+        fetch(`/api/delete-patient/${patient_id}/`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {

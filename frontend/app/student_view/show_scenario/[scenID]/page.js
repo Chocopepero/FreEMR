@@ -54,7 +54,7 @@ export default function ShowScenario() {
             try {
                 setIsLoading(true);
                 // Fetch the scenario data
-                const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get-scenario/${scenID}/`);
+                const response = await fetch(`/api/get-scenario/${scenID}/`);
                 
                 if (!response.ok) {
                     throw new Error('Failed to fetch scenario data');
@@ -68,7 +68,7 @@ export default function ShowScenario() {
                 });
 
                 // Now fetch patient data using the patient ID from the scenario
-                const patientResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get-patient/${data.patient}/`);
+                const patientResponse = await fetch(`/api/get-patient/${data.patient}/`);
                 
                 if (!patientResponse.ok) {
                     throw new Error('Failed to fetch patient data');
