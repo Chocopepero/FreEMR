@@ -47,12 +47,13 @@ const NavBar = () => {
 
     const handleLogout = async () => {
         const csrfToken = getCookie('csrftoken');
+        console.log("document.cookie:", document.cookie);
+        console.log("csrfToken:", csrfToken);
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/logout/`, {
                 method: 'POST',
                 credentials: 'include', // Ensures cookies are sent
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': csrfToken,
                 },
             });
