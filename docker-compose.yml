@@ -3,7 +3,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: nextjs_frontend
+    container_name: frontend
     ports:
       - "3000:3000"
     volumes:
@@ -21,7 +21,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: django_backend
+    container_name: backend
     ports:
       - "8000:8000"
     volumes:
@@ -31,6 +31,26 @@ services:
     networks:
       - freemr-network
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - freemr-network
+
 networks:
   freemr-network:
     driver: bridge
+
+volumes:
+  postgres_data:

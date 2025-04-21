@@ -1,12 +1,11 @@
 import { Suspense } from "react";
-import ApplicationContent from "./content";
+import LoginPage from "./component";
 
 export default function Application() {
   return (
     <div>
-      <h1>Application</h1>
       <Suspense fallback={<p>Loading...</p>}>
-        <ApplicationContent />
+        <LoginPage />  
       </Suspense>
     </div>
   );
