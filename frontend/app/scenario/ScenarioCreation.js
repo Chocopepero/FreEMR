@@ -36,7 +36,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
   const useExistingData = async () => {
     if (scenarioId) {
       try {
-        const response = await fetch(`/api/single-scenario/${scenarioId}/`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/single-scenario/${scenarioId}/`, {
           credentials: 'include',
         });
 
@@ -48,7 +48,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
         console.log('Fetched data:', data);
         if (data.patient) {
           try {
-            const response = await fetch(`/api/get-patient/${data.patient}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get-patient/${data.patient}`, {
               credentials: 'include',
             });
             if (!response.ok) {
@@ -98,7 +98,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
   useEffect(() => {
     async function fetchPatients() {
       try {
-        const response = await fetch(`/api/get_user_patients/`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get_user_patients/`, {
           credentials: 'include',
         });
         if (!response.ok) {
@@ -188,7 +188,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
 
 
     try {
-      const response = await fetch(`/api/submit-scenario/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
         method: 'POST',
         credentials: 'include',
         headers: {
