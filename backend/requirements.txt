@@ -2,3 +2,4 @@ Django>5.1
 djangorestframework
 django-cors-headers
 python-dotenv
+psycopg2

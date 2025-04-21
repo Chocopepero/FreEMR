@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 def get_global_user():
     try:
@@ -9,7 +10,7 @@ def get_global_user():
         global_user = User.objects.get(username='global')
     except ObjectDoesNotExist:
         # If the global user doesn't exist, create it. You might want to do this in a data migration instead.
-        global_user = User.objects.create_user(username='global', password='somepassword')
+        global_user = User.objects.create_user(username='global', password='somepassword', last_login=timezone.now())
     return global_user.pk
 
 # Create your models here.
