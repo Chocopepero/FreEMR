@@ -11,7 +11,7 @@ export default function ShowPatient() {
     const patientId = params.id;
     useEffect(() => {
 
-        fetch(`/api/get-patient/${patientId}`)
+        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get-patient/${patientId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Failed to fetch patient data')

@@ -23,7 +23,7 @@ function ScenarioPage() {
     }
 
     useEffect(() => {
-        fetch(`/api/scenario-data/`, {
+        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/scenario-data/`, {
             credentials: 'include',
         })
             .then(response => {
@@ -38,7 +38,7 @@ function ScenarioPage() {
 
     const handleDeleteClick = (scenario_id) => {
         const csrfToken = getCookie('csrftoken');
-        fetch(`/api/delete-scenario/${scenario_id}/`, {
+        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/delete-scenario/${scenario_id}/`, {
             method: 'DELETE',
             credentials: 'include',
             headers: {
