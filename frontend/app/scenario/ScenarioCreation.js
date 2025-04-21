@@ -266,7 +266,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
       );
     } else if (selectedButton === 'Notes') {
       return (
-        <div className="bg-gray-500 flex flex-col h-full justify-center items-center">
+        <div className="bg-gray-700 flex flex-col h-full justify-center items-center">
           <NotesComponent addNote={addNote} removeNote={removeNote} notes={formData.notes} />
         </div>
       );
