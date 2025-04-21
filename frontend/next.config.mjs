@@ -1,15 +1,14 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-module.exports = {
+const nextConfig = {
     async rewrites() {
-        return [
-            {
-                source: '/api/:path*',
-                destination: process.env.NEXT_PUBLIC_APP_BACKEND_URL + '/api/:path*',
-            },
-        ];
+      return [
+        {
+          source: '/api/:path*',
+          destination: process.env.NEXT_PUBLIC_APP_BACKEND_URL + '/api/:path*',
+        },
+      ];
     },
-};
-
-export default nextConfig;
+  };
+  
+  export default nextConfig;
+  
