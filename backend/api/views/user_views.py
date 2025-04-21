@@ -1,10 +1,13 @@
 from django.http import JsonResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import permission_classes
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
@@ -35,13 +38,15 @@ def login_page(request):
     print("Logged in")
     return JsonResponse({'success': True, 'message': 'Login successful'})
 
+@ensure_csrf_cookie
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def current_user(request):
     if request.user.is_authenticated:
         return JsonResponse({
             'username': request.user.username,
-            'email': request.user.email,
-            'user_id': request.user.id,
+            'email':    request.user.email,
+            'user_id':  request.user.id,
         })
     else:
         return JsonResponse({'error': 'Not authenticated'}, status=401)
