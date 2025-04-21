@@ -69,6 +69,12 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
 ]
 
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = "None"
+
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "None"
+
 ROOT_URLCONF = 'myproject.urls'
 
 TEMPLATES = [
