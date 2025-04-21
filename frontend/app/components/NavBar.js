@@ -26,7 +26,7 @@ const NavBar = () => {
         async function fetchUser() {
             try {
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/current_user/`,
+                    `$/api/current_user/`,
                     {
                         credentials: 'include',
                     }
@@ -50,7 +50,7 @@ const NavBar = () => {
         console.log("document.cookie:", document.cookie);
         console.log("csrfToken:", csrfToken);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/logout/`, {
+            const res = await fetch(`/api/logout/`, {
                 method: 'POST',
                 credentials: 'include', // Ensures cookies are sent
                 headers: {

@@ -9,7 +9,7 @@ const DisplayPatient = ({ patientId }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/get-patient/${patientId}/`, {
+      const response = await fetch(`/api/get-patient/${patientId}/`, {
         method: 'GET',
         mode: 'cors',
         credentials: 'include',
