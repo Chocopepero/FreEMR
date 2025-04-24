@@ -74,6 +74,9 @@ CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = "None"
 
+SESSION_COOKIE_DOMAIN = ".freemrsoftware.com"   # leading dot shares cookie across sub-domains
+CSRF_COOKIE_DOMAIN    = ".freemrsoftware.com"
+
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "None"
 
