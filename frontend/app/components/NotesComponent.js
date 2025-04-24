@@ -8,7 +8,7 @@ const NotesComponent = ({ addNote, removeNote, notes }) => {
   };
 
   return (
-    <div className="bg-gray-500 flex-grow w-full flex flex-col text-black">
+    <div className="flex-grow w-full flex flex-col text-black">
       {Array.from({ length: 3 }).map((_, index) => (
         <textarea
           key={index}
