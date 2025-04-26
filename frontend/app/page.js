@@ -37,9 +37,9 @@ export default function Home() {
       <div className='mt-12 text-4xl text-blue-200 font-bold'>
           How do you use FreEMR as a Student?
           <div className='text-lg text-blue-300 mt-4 indent-10'>
-            <p>1. Recieve a link from your instructor </p>
+            <p>1. Receive a link from your instructor </p>
             <p>2. Make changes as your instructor specifies </p>
-            <p>3. Download a text file of your scenarion changes or email the changes directly </p>
+            <p>3. Download a text file of your scenario changes or email the changes directly </p>
           </div>
       </div>
 
