@@ -39,7 +39,8 @@ export default function ShowScenario() {
         height: "Height (inches)",
         weight: "Weight (pounds)",
         allergies: "Allergies",
-        // Add other mappings as needed
+        diagnosis: "Diagnosis",
+        medical_doctor: "Assigned Doctor",
     };
 
 
@@ -64,7 +65,10 @@ export default function ShowScenario() {
                 setScenario({
                     id: data.scenario_id,
                     name: data.name,
-                    description: data.description
+                    description: data.description,
+                    diagnosis: data.diagnosis,
+                    allergies: data.allergies,
+                    medical_doctor: data.medical_doctor
                 });
 
                 // Now fetch patient data using the patient ID from the scenario
@@ -127,34 +131,7 @@ export default function ShowScenario() {
         }));
     };
 
-    // Handle medication edits
-    const handleMedicationChange = (index, field, value) => {
-        const updatedMedications = [...medications];
-        updatedMedications[index] = {
-            ...updatedMedications[index],
-            [field]: value
-        };
-        setMedications(updatedMedications);
-        
-        // Track edited fields
-        setEditedFields(prev => ({
-            ...prev,
-            [`medication_${index}_${field}`]: true
-        }));
-    };
 
-    // Handle adding a new medication
-    const handleAddMedication = () => {
-        const updatedMedications = [...medications, {...emptyMedication}];
-        setMedications(updatedMedications);
-        
-        // Mark the new medication as edited
-        const newIndex = medications.length;
-        setEditedFields(prev => ({
-            ...prev,
-            [`medication_${newIndex}_medication`]: true
-        }));
-    };
 
     const MakeContent = () => {
         // Create content for patient data
@@ -252,6 +229,15 @@ export default function ShowScenario() {
                         className={`ml-2 p-2 border ${nameError ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded w-64`}
                     />
                 </label>
+                <label className="block mb-2 font-semibold">
+                    Current Date: 
+                    <input
+                        type="text" 
+                        value={new Date().toLocaleDateString()}
+                        readOnly
+                        className="ml-2 p-2 border border-gray-300 rounded w-64"
+                    />
+                </label>
                 {nameError ? (
                     <p className="text-sm text-red-600 font-medium">Please enter your name before downloading.</p>
                 ) : (
@@ -281,17 +267,39 @@ export default function ShowScenario() {
                                         type="text" 
                                         value={value || ''}
                                         onChange={(e) => handlePatientChange(key, e.target.value)}
-                                        className={`w-full p-1 border rounded ${editedFields[`patient_${key}`] ? 'border-yellow-400' : 'border-gray-300'}`}
+                                        className={`w-full p-1 border bg-gray-300 rounded ${editedFields[`patient_${key}`] ? 'border-yellow-400' : 'border-gray-300'}`}
+                                        readOnly
                                     />
-                                    {editedFields[`patient_${key}`] && (
-                                        <div className="text-xs text-yellow-600">(edited)</div>
-                                    )}
                                 </div>
                             )
                         ))}
                     </div>
                 </div>
             )}
+
+            {/* Extra Information */}
+            {scenario && (
+            <div className="mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(scenario).map(([key, value]) => (
+                        (key === 'diagnosis' || key === 'allergies' || key === 'medical_doctor') && (
+                            <div key={key} className="bg-white p-4 rounded shadow">
+
+                                <p className="font-semibold">{fieldLabels[key] || key}</p>
+                                <input 
+                                    type="text" 
+                                    value={value || ''}
+                                    className="w-full p-1 border rounded border-gray-300 bg-gray-300"
+                                    readOnly
+                                />
+                            </div>
+                        )
+                    ))}
+                </div>
+            </div>
+            )}
+
+            
 
             {/* Medication section */}
             <div>
