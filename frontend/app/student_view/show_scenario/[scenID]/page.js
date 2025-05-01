@@ -135,17 +135,17 @@ export default function ShowScenario() {
     // Updated checkIfPatientIsSame function
     const checkIfPatientIsSame = (patientID) => {
         if (!patientID) {
-            alert("Please enter a patient ID first");
+            setPatientVerified(false); // Reset patient verification
             return;
         }
         
         if (patientID === patient.patient_id) {
-            alert("Patient verified successfully!");
+
             setPatientVerified(true); // Set patient as verified
 
             return;
         } else {
-            alert("This is a different patient. Please scan the correct patient.");
+
             setPatientVerified(false); // Reset patient verification
         }
     };
@@ -304,7 +304,12 @@ export default function ShowScenario() {
                         </svg>
                         Verify Patient
                     </button>
+
                 </div>
+                <p className={`ml-4 text-sm my-4 ${patientVerified ? 'text-green-300' : 'text-red-300'}`}>
+                        {patientVerified ? 'Patient verified successfully!' : '*Incorrect Patient. Please try again.*'}
+                </p>
+                
             </div>
 
             {/* Patient Information */}
