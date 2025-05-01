@@ -192,19 +192,21 @@ function PatientPage() {
                             <tr key={index}>
                                 <td className="border border-gray-400 px-4 py-2">{item.patient_id}</td>
                                 <td className="border border-gray-400 px-4 py-2">{item.name}</td>
-                                <td className="border border-gray-400 px-4 py-2 flex justify-center">
-                                    {user && user.user_id == item.owner ? (<div>                                    <button
-                                        // Might implement this as a modal and not a new page
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-                                    >
-                                        Edit
-                                    </button>
-                                        <button
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold ml-4 py-2 px-4 rounded transition"
-                                            onClick={() => handleDeleteClick(item.patient_id)}
-                                        >Delete</button> </div>) : (<div>
+                                <td className="border border-gray-400 px-4 py-2 flex justify-center items-center">
+                                    {user && user.user_id == item.owner ? (
+                                        <div>                           
+                                            <button
+                                                className="bg-red-500 hover:bg-red-700 text-white font-bold ml-4 py-2 px-4 rounded transition"
+                                                onClick={() => handleDeleteClick(item.patient_id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div>
                                             <h2>Sample Patient</h2>
-                                        </div>)}
+                                        </div>
+                                    )}
                                 </td>
                             </tr>
                         ))}
