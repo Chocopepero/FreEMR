@@ -190,10 +190,9 @@ const MedicationOutput = ({ initialData }) => {
     const handleInputChange = (e) => {
         const value = e.target.value;
         setInputValue(value);
-
         if (value === '') {
             setTextareaContent('');
-        } else if (selectedRow && value === selectedRow.ndc) {
+        } else if (selectedRow && parseInt(value) ===  selectedRow.ndc) {
             setTextareaContent('Matched content');
             setIsNdcMatched(true);
         } else {
@@ -220,6 +219,7 @@ const MedicationOutput = ({ initialData }) => {
 
     const handleOpenModal = (row) => {
         setSelectedRow(row);
+        console.log(row);
         setFormData({
             time: row.time || "",
             initial: row.initial || "",
