@@ -28,7 +28,7 @@ class Patient(models.Model):
         return f"{self.name} ({self.patient_id})"
     
 class Medication(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.BigIntegerField(primary_key=True)
     medication = models.CharField(max_length=100)
     start = models.IntegerField(validators=[MinValueValidator(0)])
     stop = models.IntegerField(validators=[MinValueValidator(0)])
