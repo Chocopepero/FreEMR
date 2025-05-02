@@ -15,7 +15,7 @@ export default function ShowScenario() {
     const [editedFields, setEditedFields] = useState({});
     const [studentName, setStudentName] = useState('');
     const [nameError, setNameError] = useState(false); // Add this new state variable
-    const [patientVerified, setPatientVerified] = useState(false); // Track if patient is verified
+    const [patientVerified, setPatientVerified] = useState(null); // Track if patient is verified
 
     // Add empty medication template
     const emptyMedication = {
@@ -306,9 +306,11 @@ export default function ShowScenario() {
                     </button>
 
                 </div>
-                <p className={`ml-4 text-sm my-4 ${patientVerified ? 'text-green-300' : 'text-red-300'}`}>
+                {patientVerified !== null && (
+                    <p className={`ml-4 text-sm my-4 ${patientVerified ? 'text-green-300' : 'text-red-300'}`}>
                         {patientVerified ? 'Patient verified successfully!' : '*Incorrect Patient. Please try again.*'}
-                </p>
+                    </p>
+                )}
                 
             </div>
 
