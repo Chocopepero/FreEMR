@@ -6,6 +6,7 @@ import Link from 'next/link';
 function ScenarioPage() {
     const [scenario, setScenario] = useState([]);
     const [error, setError] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
     function getCookie(name) {
         let cookieValue = null;
@@ -33,6 +34,20 @@ function ScenarioPage() {
                 return response.json();
             })
             .then(data => setScenario(data.scenarios || []))
+            .catch(err => setError(err.message));
+    }, []);
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/current_user/`, {
+            credentials: 'include',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch current user data');
+                }
+                return response.json();
+            })
+            .then(data => setCurrentUser(data.user_id))
             .catch(err => setError(err.message));
     }, []);
 
@@ -101,18 +116,24 @@ function ScenarioPage() {
                                                 onClick={() => copyLinkToClipboard(item.scenario_id)}
                                             >Link</button>
 
-                                        <Link
-                                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-                                            href={`/scenario/edit/${item.scenario_id}`}
-                                        >
-                                            Edit
-                                        </Link>
+                                        {currentUser === item.owner_id && (
+                                            <>
+                                                <Link
+                                                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
+                                                    href={`/scenario/edit/${item.scenario_id}`}
+                                                >
+                                                    Edit
+                                                </Link>
 
-                                        <button
-                                            type='button'
-                                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
-                                            onClick={() => handleDeleteClick(item.scenario_id)}
-                                        >Delete</button>
+                                                <button
+                                                    type='button'
+                                                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition"
+                                                    onClick={() => handleDeleteClick(item.scenario_id)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </td>
                             </tr>
