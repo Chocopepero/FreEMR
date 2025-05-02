@@ -15,6 +15,7 @@ export default function ShowScenario() {
     const [editedFields, setEditedFields] = useState({});
     const [studentName, setStudentName] = useState('');
     const [nameError, setNameError] = useState(false); // Add this new state variable
+    const [patientVerified, setPatientVerified] = useState(false); // Track if patient is verified
 
     // Add empty medication template
     const emptyMedication = {
@@ -109,7 +110,7 @@ export default function ShowScenario() {
         if (body) params += `${subject ? '&' : ''}body=${encodeURIComponent(body)}`;
         
         return <a href={`mailto:${email}${params}`} target="_blank">{children}</a>;
-        };
+    };
 
     const handleStudentNameChange = (e) => {
         const name = e.target.value;
@@ -131,7 +132,23 @@ export default function ShowScenario() {
         }));
     };
 
+    // Updated checkIfPatientIsSame function
+    const checkIfPatientIsSame = (patientID) => {
+        if (!patientID) {
+            setPatientVerified(false); // Reset patient verification
+            return;
+        }
+        
+        if (patientID === patient.patient_id) {
 
+            setPatientVerified(true); // Set patient as verified
+
+            return;
+        } else {
+
+            setPatientVerified(false); // Reset patient verification
+        }
+    };
 
     const MakeContent = () => {
         // Create content for patient data
@@ -139,12 +156,13 @@ export default function ShowScenario() {
         content += "SCENARIO INFORMATION\n";
         content += `Name: ${scenario.name}\n`;
         content += `Description: ${scenario.description}\n`;
-        content += `ID: ${scenario.id}\n\n`;
+        content += `ID: ${scenario.id}\n`;
+        content += `PATIENT VERIFIED: ${patientVerified ? "YES" : "NO"}\n\n`;
         
         content += "PATIENT INFORMATION\n";
         Object.entries(patient).forEach(([key, value]) => {
             // Skip owner field in download
-            if (key !== 'owner') {
+            if (key !== 'owner') { 
                 const isEdited = editedFields[`patient_${key}`] ? " [EDITED]" : "";
                 content += `${key}: ${value}${isEdited}\n`;
             }
@@ -254,6 +272,46 @@ export default function ShowScenario() {
                 </div>
             )}
 
+            {/* Patient ID Scanning */}
+            <div>
+                <h2 className="text-xl font-bold mb-4 border-b pb-2 bg-blue-500 text-white p-2 rounded-t">Scan Patient Data</h2>
+                <div className="flex mb-4">
+                    <div className={`flex items-center mx-2 ${patientVerified ? `bg-green-500` : `bg-red-500`} rounded p-2`}>
+                        {patientVerified ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        )}
+                    </div>
+                    <input 
+                        type="text" 
+                        id="patientIdInput"
+                        onChange={(e) => e.target.value} // Just update the input value without checking yet
+                        placeholder="Scan Patient ID"
+                        className="flex-grow p-2 border border-gray-300 rounded-l"
+                    />
+
+                    <button 
+                        onClick={() => checkIfPatientIsSame(document.getElementById('patientIdInput').value)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-r hover:bg-blue-600 transition flex items-center"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                        </svg>
+                        Verify Patient
+                    </button>
+
+                </div>
+                <p className={`ml-4 text-sm my-4 ${patientVerified ? 'text-green-300' : 'text-red-300'}`}>
+                        {patientVerified ? 'Patient verified successfully!' : '*Incorrect Patient. Please try again.*'}
+                </p>
+                
+            </div>
+
             {/* Patient Information */}
             {patient && (
                 <div className="mb-8">
@@ -277,7 +335,7 @@ export default function ShowScenario() {
                 </div>
             )}
 
-            {/* Extra Information */}
+            {/* Extra Information (more scenario attributes) */}
             {scenario && (
             <div className="mb-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

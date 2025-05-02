@@ -30,6 +30,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
   });
   const [loading, setLoading] = useState(true);
   const [patients, setPatients] = useState([]);
+  const [formError, setFormError] = useState(null);
 
 
 
@@ -185,28 +186,51 @@ export default function ScenarioCreation({ scenarioId = null }) {
 
   const handleSubmit = async () => {
     const csrfToken = getCookie('csrftoken');
-
-
+  
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_APP_BACKEND_URL}/api/submit-scenario/`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+  
       const data = await response.json();
+  
+      if (!response.ok) {
+        // single‐string error
+        if (data.error && typeof data.error === 'string') {
+          setFormError(data.error);
+        }
+        // object-of-arrays error
+        else if (data && typeof data === 'object') {
+          const lines = [];
+          Object.entries(data).forEach(([field, messages]) => {
+            // messages might be a string or array
+            const arr = Array.isArray(messages) ? messages : [messages];
+            arr.forEach(msg =>
+              lines.push(`${field}: ${msg}`)
+            );
+          });
+          setFormError(lines.join('\n\n'));
+        }
+        return;
+      }
+  
       console.log('Success:', data);
       router.push('/scenario');
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (networkError) {
+      console.error('Fetch failed:', networkError);
+      setFormError('Network error, please try again.');
     }
   };
+  
 
   const handlePatientSelect = (selectedId) => {
     const selectedPatient = patients.find((p) => p.patient_id === selectedId);
@@ -362,6 +386,10 @@ export default function ScenarioCreation({ scenarioId = null }) {
         >
           Submit Scenario
         </button>
+        {formError &&(
+      <div className='flex justify-center w-full p-2'>
+        <p className="text-red-700 font-bold whitespace-pre-line font-sans">{formError}</p>
+      </div>)}
       </div>
       <div className="w-5/6 bg-gray-700 overflow-y-auto">
         {getContentForButton(selectedButton)}

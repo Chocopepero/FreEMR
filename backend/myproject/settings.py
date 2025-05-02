@@ -69,16 +69,20 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
 ]
 
-CSRF_COOKIE_HTTPONLY = False
-
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = "None"
-
-SESSION_COOKIE_DOMAIN = ".freemrsoftware.com"   # leading dot shares cookie across sub-domains
-CSRF_COOKIE_DOMAIN    = ".freemrsoftware.com"
-
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = "None"
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_SAMESITE = "Lax"  # or "Strict"
+    CSRF_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SESSION_COOKIE_DOMAIN = None
+    CSRF_COOKIE_DOMAIN = None
+else:
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = "None"
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = "None"
+    SESSION_COOKIE_DOMAIN = ".freemrsoftware.com"
+    CSRF_COOKIE_DOMAIN = ".freemrsoftware.com"
 
 ROOT_URLCONF = 'myproject.urls'
 
