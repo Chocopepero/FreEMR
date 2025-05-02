@@ -28,7 +28,8 @@ def get_scenario_without_auth(request, scenario_id):
                 'stop': med.stop,
                 'time': med.time,
                 'initial': med.initial,
-                'site': med.site
+                'site': med.site,
+                'ndc': med.id,
             })
         
         data['medication'] = medication_data
