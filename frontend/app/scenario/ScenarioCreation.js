@@ -369,7 +369,7 @@ export default function ScenarioCreation({ scenarioId = null }) {
     hover:bg-blue-300 transition-colors duration-200`}
           onClick={() => handleButtonClick('Patient Info')}
         >
-          Patient Info
+          Medication Administration Record (MAR)
         </div>
         <div
           className={`p-4 mt-4 w-full cursor-pointer rounded 

@@ -30,11 +30,15 @@ class Patient(models.Model):
 class Medication(models.Model):
     id = models.BigIntegerField(primary_key=True)
     medication = models.CharField(max_length=100)
-    start = models.IntegerField(validators=[MinValueValidator(0)])
-    stop = models.IntegerField(validators=[MinValueValidator(0)])
+    dose = models.CharField(max_length=100)
+    start_times = models.JSONField()
+    stop = models.IntegerField(blank=True, null=True, validators=[MinValueValidator(0)])
     time = models.IntegerField(blank=True, null=True)
     initial = models.CharField(max_length=5, blank=True, null=True)
     site = models.CharField(max_length=5, blank=True, null=True)
+    status = models.CharField(max_length=20, blank=True, null=True)
+    frequency = models.CharField(max_length=100, blank=True, null=True)
+    prn = models.BooleanField(default=False)
 
     def __str__(self):
         return f"({self.medication})"
