@@ -24,12 +24,16 @@ def get_scenario_without_auth(request, scenario_id):
         for med in scenario.medication.all():
             medication_data.append({
                 'medication': med.medication,
-                'start': med.start,
+                'start_times': med.start_times,
                 'stop': med.stop,
                 'time': med.time,
                 'initial': med.initial,
                 'site': med.site,
                 'ndc': med.id,
+                'dose': med.dose,
+                'status': med.status,
+                'frequency': med.frequency,
+                'prn': med.prn,
 
             })
         
@@ -73,16 +77,19 @@ def validate_patient_data(patient_data):
 def validate_medications_data(medications_data):
     medication_ids = []
     for med_data in medications_data:
-        # Check if 'ndc' exists and is not None
+
+        # Check if 'ndc' exists and is valid
         if 'ndc' not in med_data or med_data['ndc'] is None:
             return Response({'error': 'Missing or invalid ndc field in medication data'}, status=400)
 
         try:
-            med_data['id'] = int(med_data.pop('ndc'))
+            med_data['id'] = int(med_data['ndc'])
         except ValueError:
             return Response({'error': 'Invalid ndc format, must be an integer'}, status=400)
-
-        # Check if 'time' exists and is not None
+            
+        if 'stop' in med_data and med_data['stop'] == '':
+            med_data['stop'] = None
+            
         if 'time' in med_data:
             if med_data['time'] == '' or med_data['time'] is None:
                 med_data['time'] = None
@@ -93,24 +100,39 @@ def validate_medications_data(medications_data):
                     return Response({'error': f"Invalid time format: {med_data['time']}"}, status=400)
 
         try:
-            medication, created = Medication.objects.get_or_create(
-                id=med_data['id'],
-                defaults={
-                    'medication': med_data.get('medication'),
-                    'start': med_data.get('start'),
-                    'stop': med_data.get('stop'),
-                    'time': med_data.get('time'),
-                    'initial': med_data.get('initial'),
-                    'site': med_data.get('site'),
-                    'status': med_data.get('status'),
-                    'frequency': med_data.get('frequency'),
-                    'prn': med_data.get('prn'),
-                    'dose': med_data.get('dose'),
-                }
-            )
+            try:
+                # Try to fetch an existing medication
+                medication = Medication.objects.get(id=med_data['id'])
+                # Update fields with new values
+                medication.medication = med_data.get('medication', medication.medication)
+                medication.start_times = med_data.get('start_times', medication.start_times)
+                medication.stop = med_data.get('stop', medication.stop)
+                medication.time = med_data.get('time', medication.time)
+                medication.initial = med_data.get('initial', medication.initial)
+                medication.site = med_data.get('site', medication.site)
+                medication.status = med_data.get('status', medication.status)
+                medication.frequency = med_data.get('frequency', medication.frequency)
+                medication.prn = med_data.get('prn', medication.prn)
+                medication.dose = med_data.get('dose', medication.dose)
+                medication.save()
+            except Medication.DoesNotExist:
+                # Create new medication if it doesn't exist
+                medication = Medication.objects.create(
+                    id=med_data['id'],
+                    medication=med_data.get('medication'),
+                    start_times=med_data.get('start_times'),
+                    stop=med_data.get('stop'),
+                    time=med_data.get('time'),
+                    initial=med_data.get('initial'),
+                    site=med_data.get('site'),
+                    status=med_data.get('status'),
+                    frequency=med_data.get('frequency'),
+                    prn=med_data.get('prn'),
+                    dose=med_data.get('dose'),
+                )
             medication_ids.append(medication.id)
         except Exception as e:
-            print(f"Error creating medication: {e}")
+            print(f"Error processing medication: {e}")
             return Response({'error': f"Failed to process medication: {med_data}"}, status=400)
     return medication_ids
 
@@ -177,31 +199,39 @@ def submit_scenario(request):
                     print(scenario_obj)
                 except Scenario.DoesNotExist:
                     return Response({'error': 'Scenario not found or does not belong to the user'}, 401)
-                serializer = ScenarioSerializer(scenario_obj, data = scenario_data, partial=True)
+                serializer = ScenarioSerializer(scenario_obj, data=scenario_data, partial=True)
                 if serializer.is_valid():
                     # Clear existing medications and re-link them
                     Scenario_Medication.objects.filter(scenario=scenario_obj).delete()
-                    serializer.save()
+                    scenario_obj = serializer.save()
+                    
+                    for med_id in medication_ids:
+                        medication = Medication.objects.get(id=med_id)
+                        Scenario_Medication.objects.create(
+                            scenario=scenario_obj,
+                            medication=medication,
+                            owner=request.user
+                        )
                 else:
                     return Response(serializer.errors, status=400)
-                
+            
             else:
                 # Create a new scenario
                 scenario_data["scenario_id"] = generate_unique_scenario_id()
                 scenario_serializer = ScenarioSerializer(data=scenario_data)
                 if scenario_serializer.is_valid():
                     scenario_obj = scenario_serializer.save()
+                    
+                    # Link medications to the scenario
+                    for med_id in medication_ids:
+                        medication = Medication.objects.get(id=med_id)
+                        Scenario_Medication.objects.create(
+                            scenario=scenario_obj,
+                            medication=medication,
+                            owner=request.user
+                        )
                 else:
                     return Response(scenario_serializer.errors, status=400)
-
-            # Link medications to the scenario
-            for med_id in medication_ids:
-                medication = Medication.objects.get(id=med_id)
-                Scenario_Medication.objects.create(
-                    scenario=scenario_obj,
-                    medication=medication,
-                    owner=request.user
-                )
 
     except Medication.DoesNotExist:
         return Response({'error': f'Medication with id {med_id} does not exist'}, status=400)
@@ -239,12 +269,16 @@ def get_single_scenario(request, scenario_id):
     medications = [
         {
             'medication': med.medication.medication,
-            'start': med.medication.start,
+            'start_times': med.medication.start_times,
             'stop': med.medication.stop,
             'time': med.medication.time,
             'initial': med.medication.initial,
             'site': med.medication.site,
             'ndc': med.medication.id,
+            'dose': med.medication.dose,
+            'status': med.medication.status,
+            'frequency': med.medication.frequency,
+            'prn': med.medication.prn,
         }
         for med in scenario_medications
     ]

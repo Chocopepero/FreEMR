@@ -36,7 +36,7 @@ class Medication(models.Model):
     time = models.IntegerField(blank=True, null=True)
     initial = models.CharField(max_length=5, blank=True, null=True)
     site = models.CharField(max_length=5, blank=True, null=True)
-    status = models.CharField(max_length=10, blank=True, null=True)
+    status = models.CharField(max_length=20, blank=True, null=True)
     frequency = models.CharField(max_length=100, blank=True, null=True)
     prn = models.BooleanField(default=False)
 

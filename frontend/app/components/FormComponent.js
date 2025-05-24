@@ -76,7 +76,7 @@ const FormComponent = ({
         name="height"
         value={formData.height}
         onChange={handleChange}
-        placeholder="Height"
+        placeholder="Height (inches)"
         required
       />
       <FormField
@@ -84,7 +84,7 @@ const FormComponent = ({
         name="weight"
         value={formData.weight}
         onChange={handleChange}
-        placeholder="Weight"
+        placeholder="Weight (lbs)"
         required
       />
       {!hideSubmitButton && (

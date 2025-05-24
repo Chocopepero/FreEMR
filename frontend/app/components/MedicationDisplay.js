@@ -9,7 +9,7 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
     const [modalError, setModalError] = useState("");
     const [newRow, setNewRow] = useState({
         ndc: "",
-        start: [""],
+        start_times: [""],
         stop: "",
         medication: "",
         dose: "",
@@ -26,7 +26,7 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
         if (name === "ndc") {
             const numericValue = value.replace(/[^0-9]/g, "");
             setNewRow((prev) => ({ ...prev, [name]: numericValue }));
-        } else if (name === "start") {
+        } else if (name === "start_times") {
             // Skip handling "start" here since it's managed separately in the start times component
         } else if (name === "stop") {
             if (value === "" || (Number(value) >= 0 && Number(value) <= 2359)) {
@@ -40,7 +40,7 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
     const resetNewRow = () => {
         setNewRow({
             ndc: "",
-            start: [""],
+            start_times: [""],
             stop: "",
             medication: "",
             dose: "",
@@ -63,14 +63,15 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
 
     const handleAddRow = () => {
         setModalError("");
-        const hasValidStartTime = newRow.start.some(time => time.trim() !== "");
-        
+        const hasValidStartTime = newRow.start_times.some(time => time.trim() !== "");
+
         if (!newRow.ndc || !hasValidStartTime || !newRow.dose || !newRow.medication || !newRow.frequency) {
             setModalError("All fields except stop time are required.")
         } else {
             const rowToAdd = {
                 ...newRow,
-                stop: newRow.stop_time,
+                stop: newRow.stop === "" ? null : newRow.stop,
+                time: newRow.time === "" ? null : newRow.time,
             };
             addRow(rowToAdd);
             resetNewRow();
@@ -101,13 +102,16 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                         <tr key={row.id || `row-${index}`}>
                             <td className="border pl-2">{row.ndc}</td>
                             <td className="border pl-2">{row.status}</td>
-                            <td className="border pl-2">{row.start}</td>
+                            <td className="border pl-2">{row.start_times.join(', ')}</td>
                             <td className="border pl-2">{row.stop}</td>
-                            <td className="border flex justify-between items-center pl-2">{row.medication}
-                                <button
-                                    className="bg-red-500 rounded m-2 px-2 text-white hover:bg-red-600"
-                                    onClick={() => removeRow(row.id)}
-                                >Delete</button>
+                            <td className="border pl-2">
+                                <div className="flex w-full justify-between items-center">
+                                    <span>{row.medication}</span>
+                                    <button
+                                        className="bg-red-500 rounded m-2 px-2 text-white hover:bg-red-600"
+                                        onClick={() => removeRow(row.id)}
+                                    >Delete</button>
+                                </div>
                             </td>
                             <td className="border pl-2">{row.dose}</td>
                             <td className="border pl-2">{row.frequency}</td>
@@ -154,17 +158,20 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                             <div className="mb-4">
                                 <label className="block text-gray-700">Start Times</label>
                                 <div className="space-y-2">
-                                    {newRow.start.map((startTime, index) => (
+                                    {newRow.start_times.map((startTime, index) => (
                                         <div key={index} className="flex items-center space-x-2">
                                             <input
-                                                type="number"
+                                                type="text"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
                                                 min="0000"
                                                 max="2359"
                                                 value={startTime}
                                                 onChange={(e) => {
-                                                    const updatedStartTimes = [...newRow.start];
-                                                    updatedStartTimes[index] = e.target.value;
-                                                    setNewRow((prev) => ({ ...prev, start: updatedStartTimes }));
+                                                    const value = e.target.value.replace(/[^0-9]/g, '');
+                                                    const updatedStartTimes = [...newRow.start_times];
+                                                    updatedStartTimes[index] = value;
+                                                    setNewRow((prev) => ({ ...prev, start_times: updatedStartTimes }));
                                                 }}
                                                 className="w-full px-3 py-2 border rounded text-black"
                                                 placeholder="0000 - 2359"
@@ -173,8 +180,8 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                                                 type="button"
                                                 className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                                 onClick={() => {
-                                                    const updatedStartTimes = newRow.start.filter((_, i) => i !== index);
-                                                    setNewRow((prev) => ({ ...prev, start: updatedStartTimes }));
+                                                    const updatedStartTimes = newRow.start_times.filter((_, i) => i !== index);
+                                                    setNewRow((prev) => ({ ...prev, start_times: updatedStartTimes }));
                                                 }}
                                             >
                                                 X
@@ -186,14 +193,14 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
                                     type="button"
                                     className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                                     onClick={() => {
-                                        setNewRow((prev) => ({ ...prev, start: [...prev.start, ""] }));
+                                        setNewRow((prev) => ({ ...prev, start_times: [...prev.start_times, ""] }));
                                     }}
                                 >
                                     Add Start Time
                                 </button>
                             </div>
                             <div className="mb-4">
-                                <label className="block text-gray-700">Stop Time</label>
+                                <label className="block text-gray-700">Stop Time (Optional)</label>
                                 <input
                                     type="number"
                                     min="0000"
@@ -304,8 +311,8 @@ const MedicationOutput = ({ initialData }) => {
 
     const handleAdd = () => {
         if (selectedRow && isNdcMatched) {
-            const updatedRows = rows.map((row) =>
-                row.id === selectedRow.id ? { ...row, ...formData } : row
+            const updatedRows = rows.map((row, idx) =>
+                idx === selectedRow.idx ? { ...row, ...formData } : row
             );
             setRows(updatedRows);
             setIsModalOpen(false);
@@ -318,8 +325,8 @@ const MedicationOutput = ({ initialData }) => {
 
     };
 
-    const handleOpenModal = (row) => {
-        setSelectedRow(row);
+    const handleOpenModal = (row, idx) => {
+        setSelectedRow({ ...row, idx });
         console.log(row);
         setFormData({
             time: row.time || "",
@@ -358,30 +365,43 @@ const MedicationOutput = ({ initialData }) => {
         <div className="relative inline-block">
             <table className="bg-gray-500 w-full h-fit border-collapse table-fixed border-spacing-3">
                 <thead>
-                    <tr>
+                    <tr key = {rows.id}>
+                        <th className="border w-1/12">Status</th>
                         <th className="border w-1/12">Start</th>
                         <th className="border w-1/12">Stop</th>
-                        <th className="border w-7/12">Medication</th>
+                        <th className="border w-4/12">Medication</th>
+                        <th className="border w-1/12">Dose</th>
+                        <th className="border w-1/12">Frequency</th>
+                        <th className="border w-1/12">PRN</th>
                         <th className="border w-1/12">Time</th>
                         <th className="border w-1/12">Initial</th>
                         <th className="border w-1/12">Site</th>
                     </tr>
                 </thead>
                 <tbody>
+
                     {rows.map((row, index) => (
                         <tr key={row.id || `row-${index}`}>
-                            <td className="border p-1">{row.start}</td>
-                            <td className="border p-1">{row.stop}</td>
-                            <td className="border p-1 flex justify-between items-center">{row.medication}
-                                <button
-                                    className="bg-red-500 rounded m-2 px-2"
-                                    onClick={() => handleOpenModal(row)}
-                                >Medication Action</button>
+                            <td className="border pl-2 text-sm">{row.status}</td>
+                            <td className="border pl-2">{row.start_times.join(', ')}</td>
+                            <td className="border pl-2">{row.stop}</td>
+                            <td className="border pl-2">
+                                <div className="flex w-full justify-between items-center">
+                                    <span>{row.medication}</span>
+                                    <button
+                                        className="bg-red-500 rounded m-2 px-2"
+                                        onClick={() => handleOpenModal(row, index)}
+                                    >Medication Action</button>
+                                </div>
                             </td>
-                            <td className="border p-1">{row.time}</td>
-                            <td className="border p-1">{row.initial}</td>
-                            <td className="border p-1">{row.site}</td>
+                            <td className="border pl-2">{row.dose}</td>
+                            <td className="border pl-2">{row.frequency}</td>
+                            <td className="border pl-2">{row.prn ? "✓" : ""}</td>
+                            <td className="border pl-2">{row.time}</td>
+                            <td className="border pl-2">{row.initial}</td>
+                            <td className="border pl-2">{row.site}</td>
                         </tr>
+                        //
                     ))}
                 </tbody>
             </table>
@@ -403,7 +423,7 @@ const MedicationOutput = ({ initialData }) => {
                                     <input
                                         type="text"
                                         name="start"
-                                        value={selectedRow.start}
+                                        value={selectedRow.start_times}
                                         readOnly
                                         className="mt-1 block w-full border border-gray-300 text-black bg-gray-500 rounded-md p-2 shadow-sm"
                                     />
