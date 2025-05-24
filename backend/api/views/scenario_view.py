@@ -30,6 +30,7 @@ def get_scenario_without_auth(request, scenario_id):
                 'initial': med.initial,
                 'site': med.site,
                 'ndc': med.id,
+
             })
         
         data['medication'] = medication_data
@@ -101,6 +102,10 @@ def validate_medications_data(medications_data):
                     'time': med_data.get('time'),
                     'initial': med_data.get('initial'),
                     'site': med_data.get('site'),
+                    'status': med_data.get('status'),
+                    'frequency': med_data.get('frequency'),
+                    'prn': med_data.get('prn'),
+                    'dose': med_data.get('dose'),
                 }
             )
             medication_ids.append(medication.id)

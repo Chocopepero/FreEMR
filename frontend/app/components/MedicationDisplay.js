@@ -9,37 +9,47 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
     const [modalError, setModalError] = useState("");
     const [newRow, setNewRow] = useState({
         ndc: "",
-        start: "",
+        start: [""],
         stop: "",
         medication: "",
+        dose: "",
         time: "",
         initial: "",
-        site: ""
+        site: "",
+        status: "Active",
+        frequency: "",
+        prn: false,
     });
-    
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === "ndc") {
-          const numericValue = value.replace(/[^0-9]/g, "");
-          setNewRow((prev) => ({ ...prev, [name]: numericValue }));
-        } else if (name !== "start" && name !== "stop") {
-          setNewRow((prev) => ({ ...prev, [name]: value }));
+            const numericValue = value.replace(/[^0-9]/g, "");
+            setNewRow((prev) => ({ ...prev, [name]: numericValue }));
+        } else if (name === "start") {
+            // Skip handling "start" here since it's managed separately in the start times component
+        } else if (name === "stop") {
+            if (value === "" || (Number(value) >= 0 && Number(value) <= 2359)) {
+                setNewRow((prev) => ({ ...prev, [name]: value }));
+            }
         } else {
-          if (value === "" || (Number(value) >= 0 && Number(value) <= 2359)) {
             setNewRow((prev) => ({ ...prev, [name]: value }));
-          }
         }
-      };
-    
+    };
+
     const resetNewRow = () => {
         setNewRow({
             ndc: "",
-            start: "",
+            start: [""],
             stop: "",
             medication: "",
+            dose: "",
             time: "",
             initial: "",
-            site: ""
+            site: "",
+            status: "Active",
+            frequency: "",
+            prn: false,
         });
         setModalError("")
         setIsModalOpen(false);
@@ -53,10 +63,16 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
 
     const handleAddRow = () => {
         setModalError("");
-        if(!newRow.ndc || !newRow.start || !newRow.stop || !newRow.medication){
-            setModalError("All fields are required.")
+        const hasValidStartTime = newRow.start.some(time => time.trim() !== "");
+        
+        if (!newRow.ndc || !hasValidStartTime || !newRow.dose || !newRow.medication || !newRow.frequency) {
+            setModalError("All fields except stop time are required.")
         } else {
-            addRow(newRow);
+            const rowToAdd = {
+                ...newRow,
+                stop: newRow.stop_time,
+            };
+            addRow(rowToAdd);
             resetNewRow();
         }
     };
@@ -70,24 +86,32 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
             <table className="bg-gray-500 w-full h-fit border-collapse table-fixed border-spacing-3">
                 <thead>
                     <tr>
-                        <th className="border w-3/12">Medication ID</th>
+                        <th className="border w-3/12">Medication ID (Barcode)</th>
+                        <th className="border w-1/12">Status</th>
                         <th className="border w-1/12">Start</th>
                         <th className="border w-1/12">Stop</th>
-                        <th className="border w-7/12">Medication</th>
+                        <th className="border w-4/12">Medication</th>
+                        <th className="border w-1/12">Dose</th>
+                        <th className="border w-1/12">Frequency</th>
+                        <th className="border w-1/12">PRN</th>
                     </tr>
                 </thead>
                 <tbody>
-                {rows.map((row, index) => (
+                    {rows.map((row, index) => (
                         <tr key={row.id || `row-${index}`}>
                             <td className="border pl-2">{row.ndc}</td>
+                            <td className="border pl-2">{row.status}</td>
                             <td className="border pl-2">{row.start}</td>
                             <td className="border pl-2">{row.stop}</td>
                             <td className="border flex justify-between items-center pl-2">{row.medication}
                                 <button
-                                    className="bg-red-500 rounded m-2 px-2 text-white hover:bg-red-600" 
+                                    className="bg-red-500 rounded m-2 px-2 text-white hover:bg-red-600"
                                     onClick={() => removeRow(row.id)}
                                 >Delete</button>
                             </td>
+                            <td className="border pl-2">{row.dose}</td>
+                            <td className="border pl-2">{row.frequency}</td>
+                            <td className="border pl-2">{row.prn ? "✓" : "X"}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -100,62 +124,139 @@ const MedicationInput = ({ rows = [], addRow, removeRow }) => {
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                    <div className="bg-white p-6 rounded shadow-md w-96">
+                    <div className="bg-white p-6 rounded shadow-md w-180">
                         <h2 className="text-xl font-bold text-black mb-4">Add Medication</h2>
-                        <div className="mb-4">
-                            <label className="block text-gray-700">Medication ID</label>
-                            <input
-                                type="text"
-                                name="ndc"
-                                step="1"
-                                value={newRow.ndc}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="Medication ID"
-                                inputMode="numeric"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Medication ID (Barcode)</label>
+                                <input
+                                    type="text"
+                                    name="ndc"
+                                    step="1"
+                                    value={newRow.ndc}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                    placeholder="Medication ID"
+                                    inputMode="numeric"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Medication</label>
+                                <input
+                                    type="text"
+                                    name="medication"
+                                    value={newRow.medication}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                    placeholder="Medication Name"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Start Times</label>
+                                <div className="space-y-2">
+                                    {newRow.start.map((startTime, index) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                            <input
+                                                type="number"
+                                                min="0000"
+                                                max="2359"
+                                                value={startTime}
+                                                onChange={(e) => {
+                                                    const updatedStartTimes = [...newRow.start];
+                                                    updatedStartTimes[index] = e.target.value;
+                                                    setNewRow((prev) => ({ ...prev, start: updatedStartTimes }));
+                                                }}
+                                                className="w-full px-3 py-2 border rounded text-black"
+                                                placeholder="0000 - 2359"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                                onClick={() => {
+                                                    const updatedStartTimes = newRow.start.filter((_, i) => i !== index);
+                                                    setNewRow((prev) => ({ ...prev, start: updatedStartTimes }));
+                                                }}
+                                            >
+                                                X
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                    onClick={() => {
+                                        setNewRow((prev) => ({ ...prev, start: [...prev.start, ""] }));
+                                    }}
+                                >
+                                    Add Start Time
+                                </button>
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Stop Time</label>
+                                <input
+                                    type="number"
+                                    min="0000"
+                                    max="2359"
+                                    name="stop_time"
+                                    value={newRow.stop_time || ""}
+                                    onChange={(e) => setNewRow((prev) => ({ ...prev, stop_time: e.target.value }))}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                    placeholder="0000 - 2359"
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Dose</label>
+                                <input
+                                    type="text"
+                                    name="dose"
+                                    value={newRow.dose}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                    placeholder="e.g. 500mg"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-gray-700">Frequency</label>
+                                <input
+                                    type="text"
+                                    name="frequency"
+                                    value={newRow.frequency}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                    placeholder="e.g. QD, BID, TID"
+                                />
+                            </div>
+                            <div className="mb-4 col-span-2">
+                                <label className="block text-gray-700">PRN</label>
+                                <input
+                                    type="checkbox"
+                                    name="prn"
+                                    checked={newRow.prn}
+                                    onChange={(e) => setNewRow((prev) => ({ ...prev, prn: e.target.checked }))}
+                                    className="ml-2"
+                                />
+                            </div>
+                            <div className="mb-4 col-span-2">
+                                <label className="block text-gray-700">Status</label>
+                                <select
+                                    name="status"
+                                    value={newRow.status}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded text-black"
+                                >
+                                    <option value="Active">Active</option>
+                                    <option value="Discontinued">Discontinued</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700">Start</label>
-                            <input
-                                type="number"
-                                min="0000"
-                                max="2359"
-                                name="start"
-                                value={newRow.start}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="0000 - 2359"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700">Stop</label>
-                            <input
-                                type="number"
-                                name="stop"
-                                value={newRow.stop}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="0000 - 2359"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-gray-700">Medication</label>
-                            <input
-                                type="text"
-                                name="medication"
-                                value={newRow.medication}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded text-black"
-                                placeholder="Medication Name"
-                            />
-                        </div>
-                        <div className="flex justify justify-end">
-                            <div className='flex w-full justify-center text-red-500'>
+                        <div className="flex justify-end">
+                            <div className="flex w-full justify-center text-red-500">
                                 {modalError}
                             </div>
                             <button
-                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
+                                className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-500 mr-2"
                                 onClick={() => resetNewRow()}
                             >
                                 Cancel
@@ -192,7 +293,7 @@ const MedicationOutput = ({ initialData }) => {
         setInputValue(value);
         if (value === '') {
             setTextareaContent('');
-        } else if (selectedRow && parseInt(value) ===  selectedRow.ndc) {
+        } else if (selectedRow && parseInt(value) === selectedRow.ndc) {
             setTextareaContent('Matched content');
             setIsNdcMatched(true);
         } else {
